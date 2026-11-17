@@ -2106,9 +2106,8 @@
       { id: "rocker_2", label: "2 кл." },
       { id: "rocker_3", label: "3 кл." },
       { id: "button_1", label: "Кнопка" },
-      { id: "button_2", label: "2 кнопки" },
-      { id: "dimmer", label: "Диммер" },
-      { id: "dimmer_rgb", label: "Крутилка RGB" },
+      { id: "button_2", label: "2 кн." },
+      { id: "dimmer_rgb", label: "RGB" },
       { id: "master_light", label: "Мастер" }
     ];
     floatingLegendEl.innerHTML =
@@ -2120,8 +2119,7 @@
           const kc = (dt && dt.maxRecommendedKeys) || 2;
           return `<div class="legend-item">${renderSwitchFaceplateHtml(item.id, { sizeClass: "is-legend", keyCount: kc, keyStates: [item.id === "master_light"], brightness: 80 })}<span>${item.label}</span></div>`;
         })
-        .join("") +
-      `<div class="legend-item legend-muted">Клик по № — точка на плане</div>`;
+        .join("");
   }
 
   function renderSwitchMarkers() {
