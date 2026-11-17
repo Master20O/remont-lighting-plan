@@ -1283,6 +1283,19 @@
         fill: "#ffffff"
       })
     );
+    [
+      { x: 842, y: 1664, w: 62, h: 46 },
+      { x: 862, y: 2091, w: 60, h: 46 }
+    ].forEach((m) => {
+      planAdditionsLayerEl.appendChild(
+        createSvgEl("rect", { x: m.x, y: m.y, width: m.w, height: m.h, fill: "#ffffff" })
+      );
+    });
+    [1690, 2138].forEach((wy) => {
+      planAdditionsLayerEl.appendChild(
+        createSvgEl("line", { x1: 954, y1: wy, x2: 926, y2: wy, stroke: "#ea580c", "stroke-width": 3 })
+      );
+    });
 
     const mirrorFx = fixturesById.get(39);
     if (mirrorFx && mirrorFx.shape && mirrorFx.shape.kind === "mirror") {
