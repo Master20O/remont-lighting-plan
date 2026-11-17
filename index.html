@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Конструктор и симулятор освещения квартиры — BM, B1–B25 / 38 точек света + вентиляция №40</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='14' fill='%232563eb'/%3E%3Cpath d='M10 16l4 4 8-8' stroke='%23fff' stroke-width='3' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="is-demo-mode">
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="topbar-brand">
+        <div class="brand-title-row">
+          <h1>Схема освещения (BM, B1–B25)</h1>
+          <span class="sim-badge" title="Локальный интерактивный макет для согласования логики и правок">
+            Симулятор проектной логики (не управляет реальным электричеством)
+          </span>
+        </div>
+        <div class="brand-subrow">
+          <span>План: 38 точек света + вентиляция №40 · 35 каналов · Посты B1–B25 + Мастер BM (только свет)</span>
+        </div>
+      </div>
+
+      <div class="topbar-controls">
+        <div class="mode-control" role="group" aria-label="Режим взаимодействия с планом">
+          <button type="button" id="btn-mode-normal" class="mode-btn is-active" data-mode="normal" title="Клик по выключателю — тест света и настройки; перетаскивание — сдвиг места на стене; клик по номеру светильника — комментарий и привязки">
+            👆 Тест и позиции
+          </button>
+          <button type="button" id="btn-mode-link" class="mode-btn" data-mode="link" title="Потяните линию от выключателя B# к номеру точки 1–40 (или обратно), чтобы перепривязать">
+            🔗 Привязка перетягиванием
+          </button>
+        </div>
+
+        <div class="variant-control" role="group" aria-label="Вариант управления светильником №38" style="display:none;">
+          <span class="variant-label">№38:</span>
+          <button type="button" id="btn-variant-A" class="variant-btn is-active" data-variant="A" title="Две точки управления №38: у входа (B15) и у кровати (B17)">
+            Вар. A (B15+B17)
+          </button>
+          <button type="button" id="btn-variant-B" class="variant-btn" data-variant="B" title="Одна точка управления №38: только у кровати (B17)">
+            Вар. B (только B17)
+          </button>
+        </div>
+
+        <div class="stats-pill" id="live-stats" aria-live="polite">
+          <span class="stat-channels">Каналы: <strong id="stat-groups">0 / 35</strong></span>
+          <span class="sep stat-channels">·</span>
+          <span>Лампы: <strong id="stat-fixtures">0 / 38</strong></span>
+        </div>
+
+        <div class="toolbar-actions">
+          <button type="button" id="btn-add-switch" class="btn-secondary" title="Добавить новый выключатель на план">
+            + Выключатель
+          </button>
+          <button type="button" id="btn-export-edits" class="btn-primary" title="Сформировать текст ваших правок и комментариев для вставки в чат">
+            📋 Скопировать правки (<span id="edits-btn-count">0</span>)
+          </button>
+          <button type="button" id="btn-lights-off" class="btn-secondary" title="Погасить все светильники в симуляторе">
+            Выключить свет
+          </button>
+          <button type="button" id="btn-reset-edits" class="btn-ghost" title="Сбросить все правки, комментарии и вернуть актуальную схему BM, B1–B25">
+            Сбросить правки
+          </button>
+          <button type="button" id="btn-toggle-dims" class="btn-secondary" title="Показать / скрыть размерные привязки (мм) и высоты h">
+            📏 Размеры (мм)
+          </button>
+          <a href="electrician.html" target="_blank" class="btn-secondary" style="text-decoration:none;display:inline-flex;align-items:center;" title="Открыть чертёж, PDF и таблицы для электрика">
+            📐 Чертежи и PDF
+          </a>
+          <button type="button" id="btn-toggle-editor" class="btn-ghost" title="Переключить режим демонстрации / редактирования">
+            ⚙️ Редактор
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <main class="workspace">
+      <section class="canvas-pane" aria-label="Интерактивный план освещения вид сверху">
+        <div class="canvas-viewport" id="canvas-viewport">
+          <div id="link-mode-banner" class="link-mode-banner is-hidden">
+            <span>🔗 <strong>Режим привязки:</strong> потяните линию от любого выключателя <strong>B#</strong> к номеру точки <strong>1–40</strong> (или наоборот), чтобы перенести, продублировать или отвязать канал.</span>
+            <button type="button" id="btn-exit-link-mode" class="banner-close-btn">Готово</button>
+          </div>
+          <div id="master-off-banner" class="master-off-banner is-hidden">
+            <span>⚡ <strong>Мастер-свет BM отключён:</strong> контактор обесточил все 38 светильников №1–39 (состояния клавиш запомнены; розетки, автокормушки и вентиляция санузла №40 работают).</span>
+            <button type="button" id="btn-restore-master-light" class="banner-close-btn">Включить свет</button>
+          </div>
+
+          <div class="plan-stage" id="plan-stage">
+            <img id="plan-image" src="assets/plan_top_view_clean.png" alt="Исходный план освещения квартиры вид сверху с нумерацией 1–38" draggable="false">
+            <svg id="plan-svg" viewBox="0 0 2380 2300" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <filter id="glow-warm" x="-50%" y="-50%" width="200%" height="200%">
+                  <feGaussianBlur stdDeviation="8" result="blur" />
+                  <feMerge>
+                    <feMergeNode in="blur" />
+                    <feMergeNode in="SourceGraphic" />
+                  </feMerge>
+                </filter>
+                <filter id="glow-accent" x="-50%" y="-50%" width="200%" height="200%">
+                  <feGaussianBlur stdDeviation="6" result="blur" />
+                  <feMerge>
+                    <feMergeNode in="blur" />
+                    <feMergeNode in="SourceGraphic" />
+                  </feMerge>
+                </filter>
+                <filter id="glow-rgb" x="-60%" y="-60%" width="220%" height="220%">
+                  <feGaussianBlur stdDeviation="11" result="blur" />
+                  <feMerge>
+                    <feMergeNode in="blur" />
+                    <feMergeNode in="SourceGraphic" />
+                  </feMerge>
+                </filter>
+              </defs>
+              <g id="layer-plan-additions"></g>
+              <g id="layer-fixtures-glow"></g>
+              <g id="layer-temp-links"></g>
+              <g id="layer-fixture-hits"></g>
+              <g id="layer-drag-wire"></g>
+            </svg>
+            <div id="layer-switches" class="switches-layer"></div>
+          </div>
+
+          <div id="item-popover" class="switch-popover is-hidden" role="dialog" aria-label="Карточка элемента"></div>
+
+          <div class="floating-legend" id="floating-legend" aria-label="Обозначения выключателей">
+            <div class="legend-item"><span class="lg-badge lg-off">×</span> Выкл</div>
+            <div class="legend-item"><span class="lg-badge lg-on">✓</span> Вкл</div>
+          </div>
+
+          <div class="zoom-controls" aria-label="Масштабирование плана">
+            <button type="button" id="btn-zoom-out" class="zoom-btn" title="Уменьшить масштаб">−</button>
+            <span id="zoom-readout" class="zoom-readout">100%</span>
+            <button type="button" id="btn-zoom-in" class="zoom-btn" title="Увеличить масштаб">+</button>
+            <button type="button" id="btn-zoom-fit" class="zoom-btn zoom-fit-btn" title="Вписать план в экран">Вписать план</button>
+          </div>
+        </div>
+      </section>
+
+      <aside class="sidebar" aria-label="Панель выключателей, светильников, правок и вопросов">
+        <div class="inspector-card" id="selected-inspector"></div>
+
+        <nav class="sidebar-tabs" role="tablist">
+          <button type="button" class="tab-btn is-active" data-tab="switches" role="tab" aria-selected="true">
+            Выключатели
+          </button>
+          <button type="button" class="tab-btn" data-tab="fixtures" role="tab" aria-selected="false">
+            Точки (39)
+          </button>
+          <button type="button" class="tab-btn" data-tab="edits" role="tab" aria-selected="false">
+            Правки (<span id="edits-tab-count">0</span>)
+          </button>
+          <button type="button" class="tab-btn" data-tab="questions" role="tab" aria-selected="false">
+            Вопросы (4)
+          </button>
+        </nav>
+
+        <div class="tab-content" id="tab-content"></div>
+      </aside>
+    </main>
+  </div>
+
+  <div id="modal-backdrop" class="modal-backdrop is-hidden" role="dialog" aria-modal="true">
+    <div id="modal-box" class="modal-box"></div>
+  </div>
+
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

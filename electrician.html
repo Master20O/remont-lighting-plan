@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Документация для электрика — BM, B1–B25 / 38 точек света + вентиляция №40</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='14' fill='%231e3a8a'/%3E%3Cpath d='M9 16h14M16 9v14' stroke='%23fff' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E">
+  <style>
+    :root {
+      --bg: #f1f5f9;
+      --paper: #ffffff;
+      --ink: #0f172a;
+      --muted: #475569;
+      --border: #cbd5e1;
+      --navy: #1e3a8a;
+      --blue: #2563eb;
+      --cyan-bg: #ecfeff;
+      --cyan-brd: #67e8f9;
+      --red-bg: #fef2f2;
+      --red-brd: #fca5a5;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      color: var(--ink);
+      background: var(--bg);
+      font-size: 13px;
+      line-height: 1.45;
+    }
+    .toolbar {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      background: #0f172a;
+      color: #f8fafc;
+      padding: 10px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      border-bottom: 2px solid var(--blue);
+    }
+    .toolbar-left {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+    .toolbar-title {
+      font-size: 15px;
+      font-weight: 700;
+    }
+    .nav-links {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .nav-links a {
+      color: #cbd5e1;
+      text-decoration: none;
+      font-size: 12px;
+      padding: 4px 8px;
+      border-radius: 5px;
+      background: rgba(255, 255, 255, 0.08);
+    }
+    .nav-links a:hover {
+      background: rgba(255, 255, 255, 0.18);
+      color: #fff;
+    }
+    .toolbar-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 6px 11px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+      border: 1px solid transparent;
+      white-space: nowrap;
+    }
+    .btn-print { background: #16a34a; color: #fff; border-color: #15803d; }
+    .btn-print:hover { background: #15803d; }
+    .btn-file { background: #1e293b; color: #e2e8f0; border-color: #475569; }
+    .btn-file:hover { background: #334155; color: #fff; }
+    .btn-back { background: #2563eb; color: #fff; border-color: #1d4ed8; }
+    .btn-back:hover { background: #1d4ed8; }
+
+    .container {
+      max-width: 1340px;
+      margin: 18px auto 48px;
+      padding: 0 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .sheet {
+      background: var(--paper);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 20px 22px;
+      box-shadow: 0 2px 10px rgba(15, 23, 42, 0.06);
+    }
+    .sheet-head {
+      background: var(--navy);
+      color: #fff;
+      padding: 12px 16px;
+      border-radius: 7px;
+      margin-bottom: 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .sheet-head h2 {
+      margin: 0;
+      font-size: 16px;
+      letter-spacing: 0.01em;
+    }
+    .sheet-head p {
+      margin: 3px 0 0;
+      font-size: 12px;
+      color: #dbeafe;
+    }
+    .sheet-badge {
+      background: #2563eb;
+      border: 1px solid #93c5fd;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .sync-banner {
+      background: #eff6ff;
+      border: 1px solid #93c5fd;
+      color: #1e3a8a;
+      padding: 9px 14px;
+      border-radius: 8px;
+      font-size: 12.5px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .plan-wrap {
+      text-align: center;
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 8px;
+    }
+    .plan-wrap img {
+      max-width: 100%;
+      height: auto;
+      display: block;
+      margin: 0 auto;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+    }
+    th {
+      background: #0f172a;
+      color: #fff;
+      text-align: left;
+      padding: 7px 8px;
+      font-weight: 700;
+      border: 1px solid #1e293b;
+      white-space: nowrap;
+    }
+    td {
+      padding: 6px 8px;
+      border: 1px solid var(--border);
+      vertical-align: top;
+    }
+    tbody tr:nth-child(even) { background: #f8fafc; }
+    tbody tr.row-master { background: var(--red-bg); }
+    tbody tr.row-vent { background: var(--cyan-bg); }
+    .pill {
+      display: inline-block;
+      padding: 1px 6px;
+      border-radius: 4px;
+      font-weight: 700;
+      font-size: 11px;
+      border: 1px solid #cbd5e1;
+      background: #fff;
+    }
+    .pill-bm { background: #fef2f2; color: #991b1b; border-color: #fca5a5; }
+    .pill-vent { background: #ecfeff; color: #0e7490; border-color: #67e8f9; }
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+    .card {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+      background: #f8fafc;
+    }
+    .card.is-red { background: var(--red-bg); border-color: var(--red-brd); }
+    .card.is-blue { background: #eff6ff; border-color: #93c5fd; }
+    .card.is-violet { background: #f5f3ff; border-color: #c4b5fd; }
+    .card.is-cyan { background: var(--cyan-bg); border-color: var(--cyan-brd); }
+    .card-hdr {
+      padding: 8px 12px;
+      font-size: 12.5px;
+      font-weight: 700;
+      color: #fff;
+      background: var(--navy);
+    }
+    .card.is-red .card-hdr { background: #991b1b; }
+    .card.is-violet .card-hdr { background: #5b21b6; }
+    .card.is-cyan .card-hdr { background: #0e7490; }
+    .card-body {
+      padding: 10px 14px;
+      font-size: 12px;
+    }
+    .card-body ul {
+      margin: 0;
+      padding-left: 18px;
+    }
+    .card-body li {
+      margin-bottom: 5px;
+    }
+    @media (max-width: 900px) {
+      .cards-grid { grid-template-columns: 1fr; }
+    }
+    @media print {
+      @page { size: A4 landscape; margin: 9mm; }
+      body { background: #fff; font-size: 10px; }
+      .toolbar, .sync-banner { display: none !important; }
+      .container { max-width: none; margin: 0; padding: 0; gap: 0; }
+      .sheet {
+        border: none;
+        box-shadow: none;
+        border-radius: 0;
+        padding: 4px 0;
+        page-break-after: always;
+        break-after: page;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+      .sheet:last-child { page-break-after: auto; break-after: auto; }
+      table { font-size: 9.5px; }
+      th, td { padding: 4px 6px; }
+    }
+  </style>
+</head>
+<body>
+  <header class="toolbar">
+    <div class="toolbar-left">
+      <div class="toolbar-title">📐 Монтажный комплект электрика (BM, B1–B25)</div>
+      <nav class="nav-links">
+        <a href="#sec-plan">План</a>
+        <a href="#sec-switches">Выключатели (23)</a>
+        <a href="#sec-fixtures">Точки (39)</a>
+        <a href="#sec-groups">Группы и треки (35)</a>
+        <a href="#sec-notes">Щит и монтаж</a>
+      </nav>
+    </div>
+    <div class="toolbar-actions">
+      <a class="btn btn-back" href="assets/electrician_smartphone.html" download="Интерактивная_схема_для_смартфона.html">📱 Скачать на смартфон</a>
+      <a class="btn btn-file" href="assets/electrician_album_final.pdf" target="_blank">📄 Альбом PDF</a>
+      <a class="btn btn-file" href="assets/electrician_plan_final.png" target="_blank">🖼️ Чертёж PNG</a>
+      <a class="btn btn-file" href="assets/electrician_tables_final.xlsx" download>📊 Excel</a>
+      <a class="btn btn-file" href="assets/electrician_points_final.csv" download>📋 CSV точки</a>
+      <a class="btn btn-file" href="assets/electrician_spec_final.md" target="_blank">📝 ТЗ (MD)</a>
+      <button type="button" class="btn btn-print" onclick="window.print()">🖨️ Печать / PDF</button>
+      <a class="btn btn-back" href="index.html">← Симулятор</a>
+    </div>
+  </header>
+
+  <main class="container">
+    <div id="sync-note" class="sync-banner" style="display:none;"></div>
+
+    <section id="sec-plan" class="sheet">
+      <div class="sheet-head">
+        <div>
+          <h2>СВОДНЫЙ ПЛАН ОСВЕЩЕНИЯ, ВЕНТИЛЯЦИИ №40 И ВЫКЛЮЧАТЕЛЕЙ (BM, B1–B25)</h2>
+          <p>38 точек освещения (№1–22, 24–39; №23 исключена) + 1 вытяжка санузла (№40) · 35 каналов управления · 23 поста</p>
+        </div>
+        <span class="sheet-badge">Лист 1 / 5</span>
+      </div>
+      <div class="plan-wrap">
+        <img src="assets/electrician_plan_final.png" alt="Итоговый чертёж для электрика">
+      </div>
+    </section>
+
+    <section id="sec-switches" class="sheet">
+      <div class="sheet-head">
+        <div>
+          <h2>ВЕДОМОСТЬ ВЫКЛЮЧАТЕЛЕЙ, РЕГУЛЯТОРОВ И МНОГОПОСТОВЫХ РАМОК (23 ПОСТА)</h2>
+          <p>Раскладка по помещениям, блокам, клавишам и проверке открывания дверей</p>
+        </div>
+        <span class="sheet-badge">Лист 2 / 5</span>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Пост</th>
+            <th>Помещение</th>
+            <th>Расположение и блок рамок</th>
+            <th>Механизм</th>
+            <th>Клавиши и каналы</th>
+            <th>Точки на плане</th>
+            <th>Высота</th>
+            <th>Дверь / примечание</th>
+          </tr>
+        </thead>
+        <tbody id="tbody-switches"></tbody>
+      </table>
+    </section>
+
+    <section id="sec-fixtures" class="sheet">
+      <div class="sheet-head">
+        <div>
+          <h2>ВЕДОМОСТЬ ТОЧЕК ОСВЕЩЕНИЯ И ВЕНТИЛЯЦИИ (№1–22, 24–40 — 39 ПОЗИЦИЙ)</h2>
+          <p>Светильник №23 исключён; №39 — встроенная подсветка зеркала; №40 — вытяжной вентилятор санузла (мимо BM)</p>
+        </div>
+        <span class="sheet-badge">Лист 3 / 5</span>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>№</th>
+            <th>Пом.</th>
+            <th>Тип прибора и монтажа</th>
+            <th>Группа</th>
+            <th>Посты (кл.)</th>
+            <th>Кабель и питание</th>
+            <th>Мастер BM</th>
+            <th>Примечание электрику</th>
+          </tr>
+        </thead>
+        <tbody id="tbody-fixtures"></tbody>
+      </table>
+    </section>
+
+    <section id="sec-groups" class="sheet">
+      <div class="sheet-head">
+        <div>
+          <h2>ВЕДОМОСТЬ ГРУПП УПРАВЛЕНИЯ (35 КАНАЛОВ) И ТРЁХКОНТУРНЫХ ТРЕКОВ 230 В</h2>
+          <p>34 канала освещения под контактором BM + 1 канал вентиляции санузла SU-VENT мимо контактора</p>
+        </div>
+        <span class="sheet-badge">Лист 4 / 5</span>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Группа</th>
+            <th>Пом.</th>
+            <th>Точки</th>
+            <th>Назначение</th>
+            <th>Посты</th>
+            <th>Автоматика / способ коммутации</th>
+            <th>Линия в щите (BM)</th>
+          </tr>
+        </thead>
+        <tbody id="tbody-groups"></tbody>
+      </table>
+    </section>
+
+    <section id="sec-notes" class="sheet">
+      <div class="sheet-head">
+        <div>
+          <h2>ТРЕБОВАНИЯ К СБОРКЕ ЭЛЕКТРОЩИТА, ВЕНТИЛЯЦИИ И МОНТАЖНЫМ ОТСТУПАМ</h2>
+          <p>Итоговая памятка перед черновыми работами и штроблением</p>
+        </div>
+        <span class="sheet-badge">Лист 5 / 5</span>
+      </div>
+      <div class="cards-grid">
+        <div class="card is-red">
+          <div class="card-hdr">1. Мастер-выключатель BM и неотключаемые линии</div>
+          <div class="card-body">
+            <ul>
+              <li><strong>Позиция BM:</strong> прихожая, нижняя стена (1800, 1514), <strong>отдельно от B1</strong>, высота <strong>~140–150 см</strong>.</li>
+              <li><strong>Схема в щите:</strong> управляет модульным контактором (25–40 А, катушка 230 В). Разрывает <strong>только 34 световые линии №1–39</strong> (положение комнатных клавиш сохраняется).</li>
+              <li><strong>СТРОГО ДО контактора BM (неотключаемые):</strong>
+                все розетки (холодильник, Wi‑Fi роутер, автокормушки/автопоилки), скрытая розетка кухонной вытяжки <code>3×2,5 мм²</code>, вытяжка санузла <strong>№40 (B20)</strong>, тёплые полы, полотенцесушитель, защита от протечек, кондиционеры.</li>
+            </ul>
+          </div>
+        </div>
+        <div class="card is-blue">
+          <div class="card-hdr">2. Импульсные (бистабильные) реле: Балкон и Спальня</div>
+          <div class="card-body">
+            <ul>
+              <li><strong>Балкон (B11 + B12 → №1–2 и №30):</strong> <code>B12</code> (на балконе, 2 кнопки без фиксации) переключает <code>№30</code> (Кл.1) и <code>№1–2</code> (Кл.2) раздельно. Общая кнопка <code>B11</code> у перехода: если оба выкл. → включает оба; если вкл. хотя бы один → выключает оба.</li>
+              <li><strong>Спальня (B22 + B24 → бра №22, 24, 25, 27):</strong> две 2-клавишные импульсные кнопки без фиксации у противоположных тумб параллельно в щит на 2 канала бистабильного реле:
+                <br>— <strong>Кл.1</strong> на обоих постах переключает левые бра <code>№22 + №24</code> (<code>BR-02 + GRP-7</code>);
+                <br>— <strong>Кл.2</strong> на обоих постах переключает нижние бра <code>№25 + №27</code> (<code>GRP-5 + GRP-6</code>).</li>
+            </ul>
+          </div>
+        </div>
+        <div class="card is-violet">
+          <div class="card-hdr">3. Регуляторы RGB, зеркало №39 и 3-контурные треки</div>
+          <div class="card-body">
+            <ul>
+              <li><strong>Зал (B7 → №15 RGB):</strong> поворотно-нажимной регулятор яркости и цвета RGB в 1 подрозетник (без лишних сцен). БП 12/24 В (+25–30% запас) и контроллер вынести в доступный люк/нишу/щит.</li>
+              <li><strong>Спальня (B23 + B25 → №26 RGBW):</strong> два синхронных поворотно-нажимных регулятора у обеих тумб на одну гардину №26.</li>
+              <li><strong>Накладные 3-контурные треки 230 В (Зал №32+35 и Кухня №33):</strong> подвод кабелем <code>5×1,5 мм²</code> (L1, L2, L3, N, PE). Все три контура рабочие; опуск натяжного потолка — ориентир ~4 см.</li>
+              <li><strong>Зеркало №39 (B13 Кл.3):</strong> вывод <code>3×1,5 мм²</code> за зеркало над раковиной; 3-клавишный пост <code>B13</code> брать <strong>IP44+</strong>.</li>
+            </ul>
+          </div>
+        </div>
+        <div class="card is-cyan">
+          <div class="card-hdr">4. Вентиляция кухни/санузла, простенки и перегородка 10,5 см</div>
+          <div class="card-body">
+            <ul>
+              <li><strong>Вентиляция кухни:</strong> настенный выключатель <strong>не нужен</strong> — только скрытая розетка <code>3×2,5 мм²</code> за верхним шкафом для надплитной вытяжки (h ≈ 205–220 см, смещение 10–15 см от трубы, мимо <code>BM</code>) + обратный клапан.</li>
+              <li><strong>Вентиляция санузла №40 (B20):</strong> кабель <code>4×1,5 мм²</code> (постоянная фаза L под таймер + от B20 + N + PE) <strong>до контактора BM</strong>.</li>
+              <li><strong>Отступы и простенки:</strong> <code>15–20 см</code> от угла, <code>10–15 см</code> от наличника, межосевой шаг <code>71 мм</code>. Простенок <code>57 см</code>: 5-постовая рамка <code>B3+B4+B9+B11+B8</code> (~366–375 мм) — проверить дверь кухни.</li>
+              <li><strong>Перегородка 10,5 см (спина к спине):</strong> использовать мелкопрофильные подрозетники <code>45 мм</code> или смещать оси соседних блоков.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="data.js"></script>
+  <script>
+    (function () {
+      const D = window.LIGHTING_DATA;
+      if (!D) return;
+
+      let switches = JSON.parse(JSON.stringify(D.switches));
+      let groups = JSON.parse(JSON.stringify(D.groups));
+      let fxComments = {};
+      let fromStorage = false;
+
+      try {
+        const raw = localStorage.getItem("lighting_editor_v4_state");
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (Array.isArray(parsed.switches) && parsed.switches.length) {
+            switches = parsed.switches;
+            fromStorage = true;
+          }
+          if (Array.isArray(parsed.groups) && parsed.groups.length) {
+            groups = parsed.groups;
+          }
+          if (parsed.fixtureComments) fxComments = parsed.fixtureComments;
+        }
+      } catch (e) {}
+
+      if (fromStorage) {
+        const note = document.getElementById("sync-note");
+        note.style.display = "flex";
+        note.innerHTML = '<span>ℹ️ Отображены позиции и привязки с учётом ваших локальных изменений из симулятора (<code>lighting_editor_v4_state</code>).</span>';
+      }
+
+      const gMap = new Map(groups.map((g) => [g.id, g]));
+      const esc = (s) => String(s || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+      const getTargets = (k) => (Array.isArray(k.targets) && k.targets.length ? k.targets : k.group === "BAL-ALL" ? ["BAL-01", "BAL-02"] : k.group ? [k.group] : []);
+
+      const blocks = {
+        B1: ["У входной двери (1 рамка)", "~90 см"],
+        BM: ["Нижняя стена прихожей, отдельно от B1 (1 рамка)", "~140–150 см"],
+        B2: ["У проёма кладовой (1 рамка)", "~90 см"],
+        B3: ["5-постовая рамка Зал/Кухня B3+B4+B9+B11+B8 (пост 1)", "~90 см"],
+        B4: ["5-постовая рамка Зал/Кухня B3+B4+B9+B11+B8 (пост 2)", "~90 см"],
+        B9: ["5-постовая рамка Зал/Кухня B3+B4+B9+B11+B8 (пост 3)", "~90 см"],
+        B11: ["5-постовая рамка Зал/Кухня B3+B4+B9+B11+B8 (пост 4)", "~90 см"],
+        B8: ["5-постовая рамка Зал/Кухня B3+B4+B9+B11+B8 (пост 5)", "~90 см"],
+        B7: ["3-постовой вертик. блок в зале B7+B6+B5 (верх)", "~90–110 см"],
+        B6: ["3-постовой вертик. блок в зале B7+B6+B5 (центр)", "~90–110 см"],
+        B5: ["3-постовой вертик. блок в зале B7+B6+B5 (низ)", "~90–110 см"],
+        B10: ["У рабочей зоны / фартука кухни (1 рамка)", "~100–110 см"],
+        B12: ["Местный пост на балконе (1 рамка)", "~90 см"],
+        B13: ["Внутри санузла у раковины, IP44+ (1 рамка)", "~90–100 см"],
+        B14: ["2-постовая рамка у входа в санузел B14+B20 (пост 1)", "~90 см"],
+        B20: ["2-постовая рамка у входа в санузел B14+B20 (пост 2, мимо BM)", "~90 см"],
+        B16: ["У входа в спальню (1 рамка)", "~90 см"],
+        B21: ["Верт. 3-постовая рамка тумба 1 B21/B22/B23 (верхний пост)", "h=742 мм"],
+        B22: ["Верт. 3-постовая рамка тумба 1 B21/B22/B23 (средний пост)", "h=671 мм"],
+        B23: ["Верт. 3-постовая рамка тумба 1 B21/B22/B23 (нижний пост)", "h=600 мм"],
+        B25: ["Верт. 3-постовая рамка тумба 2 B25/B24/B19 (верхний пост)", "h=742 мм"],
+        B24: ["Верт. 3-постовая рамка тумба 2 B25/B24/B19 (средний пост)", "h=671 мм"],
+        B19: ["Верт. 3-постовая рамка тумба 2 B25/B24/B19 (нижний пост)", "h=600 мм"]
+      };
+
+      const cableFor = (fx) => {
+        const id = fx.id;
+        if ([32, 33, 35].includes(id)) return ["ВВГнг(А)-LS 5×1,5 мм² (L1, L2, L3, N, PE)", "3 контура 230 В"];
+        if (id === 40) return ["ВВГнг(А)-LS 4×1,5 мм² (L пост. + L1 от B20 + N + PE)", "Вытяжка санузла; 4 жилы под таймер"];
+        if ([15, 26].includes(id)) return ["3×1,5 мм² к БП + шлейф RGB(W) + упр.", "БП и контроллер в доступном месте"];
+        if ([4, 5, 8, 10, 13, 36].includes(id)) return ["3×1,5 мм² к БП 12/24 В + 2×1,5 мм² к ленте", "БП с запасом 25–30%"];
+        if (id === 39) return ["ВВГнг(А)-LS 3×1,5 мм² за зеркало", "Зона IP44+"];
+        return ["ВВГнг(А)-LS 3×1,5 мм²", "Стандартная линия 230 В"];
+      };
+
+      // Render Switches Table
+      const M = window.LIGHTING_MOUNTING || { switches: {}, fixtures: {} };
+      document.getElementById("tbody-switches").innerHTML = switches.map((sw) => {
+        const dt = D.deviceTypes[sw.deviceType] || {};
+        const blk = blocks[sw.id] || [`Позиция (${sw.x}, ${sw.y})`, "~90 см"];
+        const mSw = (M.switches && M.switches[sw.id]) || null;
+        let keysHtml = "";
+        let fxStr = "";
+        if (sw.isMaster) {
+          keysHtml = "Кл.1 (мастер): 34 группы света №1–39 (через контактор)";
+          fxStr = "Весь свет №1–39; розетки и №40 работают всегда";
+        } else {
+          const ks = [];
+          const fids = new Set();
+          (sw.keys || []).forEach((k) => {
+            const tgs = getTargets(k);
+            const kFids = [...new Set(tgs.flatMap((gid) => (gMap.get(gid) ? gMap.get(gid).fixtures : [])))].sort((a, b) => a - b);
+            kFids.forEach((n) => fids.add(n));
+            ks.push(`<b>Кл.${k.key}:</b> ${esc(tgs.join("+"))} (${kFids.map((n) => "№" + n).join(", ")})`);
+          });
+          keysHtml = ks.join("<br>") || "—";
+          fxStr = [...fids].sort((a, b) => a - b).map((n) => "№" + n).join(", ") || "—";
+        }
+        const cls = sw.isMaster ? "row-master" : sw.id === "B20" ? "row-vent" : "";
+        const doorTxt = sw.doorCheck ? `<b>ДА:</b> ${esc(sw.doorNote)}` : (sw.comment ? esc(sw.comment) : "Нет");
+        const locHtml = mSw && mSw.chaseSpec
+          ? `${esc(blk[0])}<br><small style="color:#92400e;font-weight:700;">🔨 ${esc(mSw.chaseSpec)}</small>`
+          : esc(blk[0]);
+        const hTxt = (mSw && mSw.heightLabel) ? mSw.heightLabel : blk[1];
+        return `<tr class="${cls}">
+          <td><b>${esc(sw.id)}</b></td>
+          <td>${esc(sw.room)}</td>
+          <td>${locHtml}</td>
+          <td>${esc(dt.fullLabel || sw.deviceType)}</td>
+          <td>${keysHtml}</td>
+          <td>${esc(fxStr)}</td>
+          <td><b>${esc(hTxt)}</b></td>
+          <td>${doorTxt}</td>
+        </tr>`;
+      }).join("");
+
+      // Render Fixtures Table
+      document.getElementById("tbody-fixtures").innerHTML = D.fixtures.map((fx) => {
+        const sws = [];
+        switches.forEach((sw) => {
+          if (sw.isMaster) return;
+          const ks = (sw.keys || []).filter((k) => getTargets(k).some((gid) => gMap.get(gid) && gMap.get(gid).fixtures.includes(fx.id))).map((k) => k.key);
+          if (ks.length) sws.push(`${sw.id} (Кл.${ks.join(",")})`);
+        });
+        const [cab, extraNote] = cableFor(fx);
+        const bmBadge = fx.isNonLight ? '<span class="pill pill-vent">МИМО BM</span>' : '<span class="pill">Через BM</span>';
+        const cmt = fxComments[fx.id] ? `${extraNote}; комм.: ${fxComments[fx.id]}` : extraNote;
+        const mFx = (M.fixtures && M.fixtures[String(fx.id)]) || null;
+        const chaseFxHtml = mFx && mFx.chaseSpec
+          ? `<br><small style="color:#92400e;font-weight:700;">🔨 ${esc(mFx.heightLabel || "потолок")} · ${esc(mFx.chaseSpec)}</small>`
+          : "";
+        return `<tr class="${fx.isNonLight ? "row-vent" : ""}">
+          <td><b>${fx.id}</b></td>
+          <td>${esc(fx.room)}</td>
+          <td>${esc(fx.type)}</td>
+          <td><code>${esc(fx.groups.join(" / "))}</code></td>
+          <td>${esc(sws.join(", ") || "—")}</td>
+          <td>${esc(cab)}</td>
+          <td>${bmBadge}</td>
+          <td>${esc(cmt)}${chaseFxHtml}</td>
+        </tr>`;
+      }).join("");
+
+      // Render Groups Table
+      document.getElementById("tbody-groups").innerHTML = groups.map((g) => {
+        const sws = [];
+        switches.forEach((sw) => {
+          if (sw.isMaster) return;
+          (sw.keys || []).forEach((k) => {
+            if (getTargets(k).includes(g.id)) sws.push(`${sw.id} (Кл.${k.key})`);
+          });
+        });
+        let auto = "Прямая клавиша выключателя";
+        if (g.isNonLight) auto = "Прямое управление B20 (фаза до контактора BM)";
+        else if (["BAL-01", "BAL-02"].includes(g.id)) auto = "Импульсное реле (B12 локально + B11 общая кнопка)";
+        else if (["BR-02", "GRP-5", "GRP-6", "GRP-7"].includes(g.id)) auto = "Импульсное реле 2 канала (кнопки B22 + B24 синхр.)";
+        else if (g.id === "Z-08") auto = "Поворотно-нажимной RGB-регулятор B7 + контроллер/БП";
+        else if (g.id === "BR-03B") auto = "Два синхронных RGB-регулятора B23 + B25";
+        else if (g.track_circuit) auto = `Отдельная фаза контура ${g.track_circuit} трека 230 В (5×1,5 мм²)`;
+        const bm = g.isNonLight ? '<span class="pill pill-vent">МИМО BM</span>' : '<span class="pill">Под BM</span>';
+        return `<tr class="${g.isNonLight ? "row-vent" : ""}">
+          <td><b><code>${esc(g.id)}</code></b></td>
+          <td>${esc(g.room)}</td>
+          <td>${g.fixtures.map((n) => "№" + n).join(", ")}</td>
+          <td>${esc(g.purpose)}</td>
+          <td>${esc(sws.join(", ") || "—")}</td>
+          <td>${esc(auto)}</td>
+          <td>${bm}</td>
+        </tr>`;
+      }).join("");
+    })();
+  </script>
+</body>
+</html>
