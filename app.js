@@ -1884,9 +1884,34 @@
     );
   }
 
+  function getFixturePlanNum(fid) {
+    const fc = window.LIGHTING_MOUNTING && window.LIGHTING_MOUNTING.fixtureChannel;
+    return (fc && fc[String(fid)]) || String(fid);
+  }
+
+  function getSwitchChannelInfo(swId) {
+    const sc = window.LIGHTING_MOUNTING && window.LIGHTING_MOUNTING.switchChannel;
+    return (sc && sc[swId]) || null;
+  }
+
+  function getSwitchFaceLabel(swId) {
+    const info = getSwitchChannelInfo(swId);
+    return (info && info.faceLabel) || swId;
+  }
+
+  function getKeyPlanNum(swId, idx, fallbackKey) {
+    const info = getSwitchChannelInfo(swId);
+    if (info && Array.isArray(info.keyNums) && info.keyNums[idx]) {
+      return info.keyNums[idx];
+    }
+    return String(fallbackKey || idx + 1);
+  }
+
   function renderFixtureHits() {
     fixtureHitsLayerEl.innerHTML = "";
     DATA.fixtures.forEach((f) => {
+      const planNum = getFixturePlanNum(f.id);
+      const isMultiTrack = planNum.indexOf(",") !== -1;
       const activeGroups = getFixtureActiveGroups(f.id);
       const isOn = activeGroups.length > 0;
       const customColorGroup = activeGroups.find((g) => !!ensureGroupSetting(g.id).color);
@@ -1934,33 +1959,71 @@
       });
       const titleEl = createSvgEl("title", {});
       titleEl.textContent = f.isNonLight
-        ? `№${f.id} (${f.room}, не свет) — ${f.type}. Клик: комментарий и привязка`
-        : `№${f.id} (${f.room}) — ${f.type}. Клик: комментарий и привязка`;
+        ? `Клавиша/точка ${planNum} (${f.room}, не свет) — ${f.type}`
+        : `Клавиша/свет ${planNum} (${f.room}) — ${f.type}`;
       hitGroup.appendChild(titleEl);
 
-      hitGroup.appendChild(
-        createSvgEl("circle", {
-          class: "fixture-badge-circle",
-          cx: f.cx,
-          cy: f.cy,
-          r: f.r,
-          fill,
-          stroke,
-          "stroke-width": strokeWidth
-        })
-      );
-
-      const numText = createSvgEl("text", {
-        class: "fixture-badge-num",
-        x: f.cx,
-        y: f.cy,
-        "text-anchor": "middle",
-        "dominant-baseline": "central",
-        fill: textFill,
-        "font-size": Math.round(f.r * 0.96)
-      });
-      numText.textContent = String(f.id);
-      hitGroup.appendChild(numText);
+      if (isMultiTrack) {
+        const pillW = Math.round(planNum.length * 8.5 + 16);
+        const pillH = 28;
+        hitGroup.appendChild(
+          createSvgEl("circle", {
+            cx: f.cx,
+            cy: f.cy,
+            r: f.r + 2,
+            fill: "#ffffff",
+            stroke: "none"
+          })
+        );
+        hitGroup.appendChild(
+          createSvgEl("rect", {
+            class: "fixture-badge-circle",
+            x: f.cx - pillW / 2,
+            y: f.cy - pillH / 2,
+            width: pillW,
+            height: pillH,
+            rx: 12,
+            fill,
+            stroke,
+            "stroke-width": strokeWidth
+          })
+        );
+        const numText = createSvgEl("text", {
+          class: "fixture-badge-num",
+          x: f.cx,
+          y: f.cy,
+          "text-anchor": "middle",
+          "dominant-baseline": "central",
+          fill: textFill,
+          "font-size": 14
+        });
+        numText.textContent = planNum;
+        hitGroup.appendChild(numText);
+      } else {
+        const badgeR = Math.max(f.r + 1.5, 16);
+        hitGroup.appendChild(
+          createSvgEl("circle", {
+            class: "fixture-badge-circle",
+            cx: f.cx,
+            cy: f.cy,
+            r: badgeR,
+            fill,
+            stroke,
+            "stroke-width": strokeWidth
+          })
+        );
+        const numText = createSvgEl("text", {
+          class: "fixture-badge-num",
+          x: f.cx,
+          y: f.cy,
+          "text-anchor": "middle",
+          "dominant-baseline": "central",
+          fill: textFill,
+          "font-size": Math.round(badgeR * 0.96)
+        });
+        numText.textContent = planNum;
+        hitGroup.appendChild(numText);
+      }
 
       bindFixtureHitEvents(hitGroup, f);
       fixtureHitsLayerEl.appendChild(hitGroup);
@@ -2182,9 +2245,11 @@
       const headEl = document.createElement("div");
       headEl.className = "sw-onkey-head";
 
+      const faceLbl = getSwitchFaceLabel(sw.id);
       const idSpan = document.createElement("span");
       idSpan.className = "sw-id";
-      idSpan.textContent = sw.id;
+      idSpan.textContent = faceLbl;
+      if (faceLbl.length >= 4) idSpan.style.fontSize = faceLbl.length >= 5 ? "8.5px" : "9.5px";
       headEl.appendChild(idSpan);
 
       const statusSpan = document.createElement("span");
@@ -2614,6 +2679,8 @@
 
   function renderDemoSwitchHudHtml(sw) {
     const dt = getEffectiveDeviceType(sw);
+    const ch = getSwitchChannelInfo(sw.id);
+    const faceLbl = getSwitchFaceLabel(sw.id);
     if (isMasterSwitch(sw)) {
       const powerOn = isMasterPowerActive();
       const miniFaceplate = renderSwitchFaceplateHtml(dt.id, {
@@ -2625,14 +2692,14 @@
         <div class="demo-hud-head">
           <div class="demo-hud-badges">
             ${miniFaceplate}
-            <span class="pop-id-badge">${sw.id}</span>
+            <span class="pop-id-badge">Мастер М</span>
             <span class="pop-room-badge">${escapeHtml(sw.room)}</span>
           </div>
           <button type="button" class="pop-close" data-close-popover="1" title="Закрыть">✕</button>
         </div>
         <div class="demo-hud-keys">
           <button type="button" class="demo-key-btn is-master ${powerOn ? "" : "is-cut"}" data-toggle-master-light="1">
-            ${powerOn ? "⚡ Выключить весь свет (кроме розеток и вент.)" : "⚡ Включить весь свет"}
+            ${powerOn ? "⚡ Выключить весь свет 1–20, 22–27 (кроме 21 и розеток)" : "⚡ Включить весь свет 1–20, 22–27"}
           </button>
         </div>
       `;
@@ -2650,13 +2717,11 @@
       ? keys
           .map((k, idx) => {
             const on = isKeyOn(k);
-            const fids = getKeyFixtures(k)
-              .map((n) => "№" + n)
-              .join(", ");
+            const kNum = getKeyPlanNum(sw.id, idx, k.key);
             return `
               <button type="button" class="demo-key-btn ${on ? "is-on" : ""}" data-toggle-sw-key="${sw.id}" data-toggle-key-idx="${idx}">
                 <span class="demo-key-dot">${on ? "✓" : "×"}</span>
-                <span>Кл. ${k.key}${fids ? " · " + escapeHtml(fids) : ""}</span>
+                <span>Клавиша ${escapeHtml(kNum)} → свет ${escapeHtml(kNum)}</span>
               </button>
             `;
           })
@@ -2692,7 +2757,7 @@
       <div class="demo-hud-head">
         <div class="demo-hud-badges">
           ${miniFaceplate}
-          <span class="pop-id-badge">${sw.id}</span>
+          <span class="pop-id-badge">Выкл. ${(ch && ch.planLabel) || faceLbl}</span>
           <span class="hw-pill hw-${dt.id}">${dt.shortLabel}</span>
           <span class="pop-room-badge">${escapeHtml(sw.room)}</span>
         </div>
@@ -2704,16 +2769,18 @@
   }
 
   function renderDemoFixtureHudHtml(f) {
+    const planNum = getFixturePlanNum(f.id);
     const keyBtns = [];
     state.switches.forEach((sw) => {
       if (isMasterSwitch(sw)) return;
       getEffectiveKeys(sw).forEach((k, idx) => {
         if (getKeyFixtures(k).includes(f.id)) {
           const on = isKeyOn(k);
+          const kNum = getKeyPlanNum(sw.id, idx, k.key);
           keyBtns.push(`
             <button type="button" class="demo-key-btn ${on ? "is-on" : ""}" data-toggle-sw-key="${sw.id}" data-toggle-key-idx="${idx}">
               <span class="demo-key-dot">${on ? "✓" : "×"}</span>
-              <span>${sw.id} · Кл. ${k.key}</span>
+              <span>Клавиша ${escapeHtml(kNum)} (${escapeHtml(sw.room)})</span>
             </button>
           `);
         }
@@ -2727,7 +2794,7 @@
     return `
       <div class="demo-hud-head">
         <div class="demo-hud-badges">
-          <span class="pop-id-badge">Точка №${f.id}</span>
+          <span class="pop-id-badge">Свет ${escapeHtml(planNum)}</span>
           <span class="pop-room-badge">${escapeHtml(f.room)}</span>
         </div>
         <button type="button" class="pop-close" data-close-popover="1" title="Закрыть">✕</button>
