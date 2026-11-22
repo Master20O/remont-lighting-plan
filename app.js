@@ -8,7 +8,7 @@
   }
 
   const SVG_NS = "http://www.w3.org/2000/svg";
-  const STORAGE_KEY = "lighting_editor_v5_state";
+  const STORAGE_KEY = "lighting_editor_v6_state";
   const ROOM_ORDER = ["Прихожая", "Кладовая", "Зал", "Кухня", "Балкон", "Санузел", "Спальня"];
   const CIRCUIT_COLORS = ["#facc15", "#fb923c", "#38bdf8"];
 
@@ -1574,7 +1574,7 @@
       state.switches.forEach((sw) => {
         const swInfo = mounting.switches && mounting.switches[sw.id];
         if (swInfo && swInfo.heightLabel) {
-          drawHeightTag(sw.x, sw.y + 24, swInfo.heightLabel, true);
+          drawHeightTag(sw.x, sw.y + 28, swInfo.heightLabel, true);
         }
       });
 
@@ -1907,6 +1907,32 @@
     return String(fallbackKey || idx + 1);
   }
 
+  function getSwitchKeyLabels(sw) {
+    if (!sw) return [];
+    if (isMasterSwitch(sw)) return ["М"];
+    const info = getSwitchChannelInfo(sw.id);
+    const keys = getEffectiveKeys(sw);
+    const dt = getEffectiveDeviceType(sw);
+    const totalSlots = Math.max(keys.length, dt.maxRecommendedKeys || 1);
+    const labels = [];
+    for (let i = 0; i < totalSlots; i++) {
+      const k = keys[i];
+      if (k && isEmptyKey(k)) {
+        labels.push("");
+        continue;
+      }
+      if (info && Array.isArray(info.keyNums) && info.keyNums[i]) {
+        labels.push(String(info.keyNums[i]));
+      } else if (k) {
+        const fxNums = [...new Set(getKeyFixtures(k).map((fid) => getFixturePlanNum(fid)))];
+        labels.push(fxNums.length ? fxNums.join("+") : String(k.key || i + 1));
+      } else {
+        labels.push("");
+      }
+    }
+    return labels;
+  }
+
   function renderFixtureHits() {
     fixtureHitsLayerEl.innerHTML = "";
     DATA.fixtures.forEach((f) => {
@@ -2074,43 +2100,56 @@
     const titles = o.slotTitles || ["", "", ""];
     const interactive = !!o.interactiveSlots;
     const slotEmpty = Array.isArray(o.slotEmpty) ? o.slotEmpty : [keyCount < 1, keyCount < 2, keyCount < 3];
+    const kl = o.sizeClass === "is-legend" ? [] : (Array.isArray(o.keyLabels) ? o.keyLabels : []);
 
     let inner = "";
     if (deviceTypeId === "rocker_1") {
-      inner = `<div class="sw-mech-rocker1 ${k0On ? "is-key-on" : ""}"><span class="sw-led"></span></div>`;
+      const n0 = kl[0] ? `<span class="sw-key-num">${escapeHtml(kl[0])}</span>` : "";
+      inner = `<div class="sw-mech-rocker1 ${k0On ? "is-key-on" : ""}">${n0}<span class="sw-led"></span></div>`;
     } else if (deviceTypeId === "rocker_2") {
       const s0 = interactive ? ` data-key-slot="0"${titles[0] ? ` title="${escapeHtml(titles[0])}"` : ""}` : "";
       const s1 = interactive ? ` data-key-slot="1"${titles[1] ? ` title="${escapeHtml(titles[1])}"` : ""}` : "";
+      const n0 = kl[0] ? `<span class="sw-key-num${kl[0].length >= 2 ? " is-2ch" : ""}">${escapeHtml(kl[0])}</span>` : "";
+      const n1 = kl[1] ? `<span class="sw-key-num${kl[1].length >= 2 ? " is-2ch" : ""}">${escapeHtml(kl[1])}</span>` : "";
       inner = `
         <div class="sw-mech-rocker2">
-          <div class="sw-half-key ${k0On ? "is-key-on" : ""} ${slotEmpty[0] ? "is-empty-slot" : ""}"${s0}><span class="sw-led"></span></div>
-          <div class="sw-half-key ${k1On ? "is-key-on" : ""} ${slotEmpty[1] ? "is-empty-slot" : ""}"${s1}><span class="sw-led"></span></div>
+          <div class="sw-half-key ${k0On ? "is-key-on" : ""} ${slotEmpty[0] ? "is-empty-slot" : ""}"${s0}>${n0}<span class="sw-led"></span></div>
+          <div class="sw-half-key ${k1On ? "is-key-on" : ""} ${slotEmpty[1] ? "is-empty-slot" : ""}"${s1}>${n1}<span class="sw-led"></span></div>
         </div>
       `;
     } else if (deviceTypeId === "rocker_3") {
       const s0 = interactive ? ` data-key-slot="0"${titles[0] ? ` title="${escapeHtml(titles[0])}"` : ""}` : "";
       const s1 = interactive ? ` data-key-slot="1"${titles[1] ? ` title="${escapeHtml(titles[1])}"` : ""}` : "";
       const s2 = interactive ? ` data-key-slot="2"${titles[2] ? ` title="${escapeHtml(titles[2])}"` : ""}` : "";
+      const n0 = kl[0] ? `<span class="sw-key-num">${escapeHtml(kl[0])}</span>` : "";
+      const n1 = kl[1] ? `<span class="sw-key-num">${escapeHtml(kl[1])}</span>` : "";
+      const n2 = kl[2] ? `<span class="sw-key-num">${escapeHtml(kl[2])}</span>` : "";
       inner = `
         <div class="sw-mech-rocker3">
-          <div class="sw-third-key ${k0On ? "is-key-on" : ""} ${slotEmpty[0] ? "is-empty-slot" : ""}"${s0}><span class="sw-led"></span></div>
-          <div class="sw-third-key ${k1On ? "is-key-on" : ""} ${slotEmpty[1] ? "is-empty-slot" : ""}"${s1}><span class="sw-led"></span></div>
-          <div class="sw-third-key ${k2On ? "is-key-on" : ""} ${slotEmpty[2] ? "is-empty-slot" : ""}"${s2}><span class="sw-led"></span></div>
+          <div class="sw-third-key ${k0On ? "is-key-on" : ""} ${slotEmpty[0] ? "is-empty-slot" : ""}"${s0}>${n0}<span class="sw-led"></span></div>
+          <div class="sw-third-key ${k1On ? "is-key-on" : ""} ${slotEmpty[1] ? "is-empty-slot" : ""}"${s1}>${n1}<span class="sw-led"></span></div>
+          <div class="sw-third-key ${k2On ? "is-key-on" : ""} ${slotEmpty[2] ? "is-empty-slot" : ""}"${s2}>${n2}<span class="sw-led"></span></div>
         </div>
       `;
     } else if (deviceTypeId === "button_1") {
+      const capCls = kl[0] && kl[0].length >= 3 ? "sw-push-cap is-pill-cap" : "sw-push-cap";
+      const capInner = kl[0]
+        ? `<span class="sw-key-num is-btn1-num">${escapeHtml(kl[0])}</span>`
+        : `<span class="sw-push-dot"></span>`;
       inner = `
         <div class="sw-mech-button1 ${k0On ? "is-key-on" : ""}">
-          <span class="sw-push-cap"><span class="sw-push-dot"></span></span>
+          <span class="${capCls}">${capInner}</span>
         </div>
       `;
     } else if (deviceTypeId === "button_2") {
       const s0 = interactive ? ` data-key-slot="0"${titles[0] ? ` title="${escapeHtml(titles[0])}"` : ""}` : "";
       const s1 = interactive ? ` data-key-slot="1"${titles[1] ? ` title="${escapeHtml(titles[1])}"` : ""}` : "";
+      const n0 = kl[0] ? `<span class="sw-key-num is-btn2-num">${escapeHtml(kl[0])}</span>` : "";
+      const n1 = kl[1] ? `<span class="sw-key-num is-btn2-num">${escapeHtml(kl[1])}</span>` : "";
       inner = `
         <div class="sw-mech-button2">
-          <div class="sw-btn-half ${k0On ? "is-key-on" : ""} ${slotEmpty[0] ? "is-empty-slot" : ""}"${s0}><span class="sw-push-cap-sm"></span></div>
-          <div class="sw-btn-half ${k1On ? "is-key-on" : ""} ${slotEmpty[1] ? "is-empty-slot" : ""}"${s1}><span class="sw-push-cap-sm"></span></div>
+          <div class="sw-btn-half ${k0On ? "is-key-on" : ""} ${slotEmpty[0] ? "is-empty-slot" : ""}"${s0}><span class="sw-push-cap-sm">${n0}</span></div>
+          <div class="sw-btn-half ${k1On ? "is-key-on" : ""} ${slotEmpty[1] ? "is-empty-slot" : ""}"${s1}><span class="sw-push-cap-sm">${n1}</span></div>
         </div>
       `;
     } else if (deviceTypeId === "dimmer") {
@@ -2120,30 +2159,33 @@
       const knobStroke = anyOn ? "#b45309" : "#475569";
       const tickStroke = anyOn ? "#b45309" : "#334155";
       const isCompact = !!o.sizeClass;
-      if (isCompact) {
-        inner = `
-          <svg class="sw-face-svg" viewBox="0 0 42 42" aria-hidden="true">
-            <path d="M 9 31 A 15 15 0 1 1 33 31" fill="none" stroke="${arcCol}" stroke-width="2.8" stroke-linecap="round"/>
-            <circle cx="21" cy="21" r="10.5" fill="${knobFill}" stroke="${knobStroke}" stroke-width="2.2"/>
-            <line x1="21" y1="21" x2="21" y2="12" stroke="${tickStroke}" stroke-width="2.5" stroke-linecap="round" transform="rotate(${deg.toFixed(0)} 21 21)"/>
-          </svg>
-        `;
-      } else {
-        inner = `
-          <svg class="sw-face-svg" viewBox="0 0 42 42" aria-hidden="true">
-            <path d="M 12.2 35 A 11.2 11.2 0 1 1 29.8 35" fill="none" stroke="${arcCol}" stroke-width="2.5" stroke-linecap="round"/>
-            <circle cx="21" cy="28" r="7.8" fill="${knobFill}" stroke="${knobStroke}" stroke-width="2"/>
-            <line x1="21" y1="28" x2="21" y2="21.5" stroke="${tickStroke}" stroke-width="2.2" stroke-linecap="round" transform="rotate(${deg.toFixed(0)} 21 28)"/>
-          </svg>
-        `;
-      }
+      const cx = 21;
+      const cy = 21;
+      const arcR = isCompact ? 15 : 16.2;
+      const knobR = isCompact ? 10 : 11.4;
+      const pt = (ang) => {
+        const rad = ((ang - 90) * Math.PI) / 180;
+        return `${(cx + arcR * Math.cos(rad)).toFixed(1)} ${(cy + arcR * Math.sin(rad)).toFixed(1)}`;
+      };
+      const tickY2 = kl[0] ? (cy - knobR + 3.6).toFixed(1) : String(cy);
+      const labelSvg = kl[0]
+        ? `<text x="${cx}" y="21.5" text-anchor="middle" dominant-baseline="central" font-size="${isCompact ? 8.5 : 11.5}" font-weight="900" fill="#0f172a">${escapeHtml(kl[0])}</text>`
+        : "";
+      inner = `
+        <svg class="sw-face-svg" viewBox="0 0 42 42" aria-hidden="true">
+          <path d="M ${pt(-125)} A ${arcR} ${arcR} 0 1 1 ${pt(125)}" fill="none" stroke="${arcCol}" stroke-width="2.6" stroke-linecap="round"/>
+          <circle cx="${cx}" cy="${cy}" r="${knobR}" fill="${knobFill}" stroke="${knobStroke}" stroke-width="2.1"/>
+          <line x1="${cx}" y1="${(cy - knobR + 0.5).toFixed(1)}" x2="${cx}" y2="${tickY2}" stroke="${tickStroke}" stroke-width="${kl[0] ? 2.6 : 2.3}" stroke-linecap="round" transform="rotate(${deg.toFixed(0)} ${cx} ${cy})"/>
+          ${labelSvg}
+        </svg>
+      `;
     } else if (deviceTypeId === "dimmer_rgb") {
       const deg = -125 + ((Math.max(15, Math.min(100, bri)) - 15) / 85) * 250;
       const isCompact = !!o.sizeClass;
       const cx = 21;
-      const cy = isCompact ? 21 : 28;
-      const arcR = isCompact ? 15 : 11.2;
-      const knobR = isCompact ? 10 : 7.5;
+      const cy = 21;
+      const arcR = isCompact ? 15 : 16.2;
+      const knobR = isCompact ? 10 : 11.4;
       const pt = (ang) => {
         const rad = ((ang - 90) * Math.PI) / 180;
         return `${(cx + arcR * Math.cos(rad)).toFixed(1)} ${(cy + arcR * Math.sin(rad)).toFixed(1)}`;
@@ -2151,6 +2193,10 @@
       const op = anyOn ? 1 : 0.65;
       const knobStroke = anyOn ? rgbColor : "#cbd5e1";
       const knobFill = anyOn ? "#ffffff" : "#e2e8f0";
+      const tickY2 = kl[0] ? (cy - knobR + 3.6).toFixed(1) : (cy - 1.5).toFixed(1);
+      const centerGraphic = kl[0]
+        ? `<text x="${cx}" y="21.5" text-anchor="middle" dominant-baseline="central" font-size="${isCompact ? 8.5 : 11.5}" font-weight="900" fill="#0f172a">${escapeHtml(kl[0])}</text>`
+        : `<circle cx="${cx}" cy="${cy}" r="${isCompact ? 3.2 : 2.6}" fill="${anyOn ? rgbColor : "#64748b"}"/>`;
       inner = `
         <svg class="sw-face-svg" viewBox="0 0 42 42" aria-hidden="true">
           <g opacity="${op}" fill="none" stroke-width="${isCompact ? 3 : 2.6}" stroke-linecap="round">
@@ -2159,14 +2205,15 @@
             <path d="M ${pt(42)} A ${arcR} ${arcR} 0 0 1 ${pt(125)}" stroke="#60a5fa"/>
           </g>
           <circle cx="${cx}" cy="${cy}" r="${knobR}" fill="${knobFill}" stroke="${knobStroke}" stroke-width="${anyOn ? 2.4 : 1.8}"/>
-          <circle cx="${cx}" cy="${cy}" r="${isCompact ? 3.2 : 2.4}" fill="${anyOn ? rgbColor : "#64748b"}"/>
-          <line x1="${cx}" y1="${cy}" x2="${cx}" y2="${(cy - knobR + 1.5).toFixed(1)}" stroke="#0f172a" stroke-width="${isCompact ? 2.4 : 2.1}" stroke-linecap="round" transform="rotate(${deg.toFixed(0)} ${cx} ${cy})"/>
+          ${centerGraphic}
+          <line x1="${cx}" y1="${(cy - knobR + 0.5).toFixed(1)}" x2="${cx}" y2="${tickY2}" stroke="#0f172a" stroke-width="${isCompact ? 2.4 : 2.3}" stroke-linecap="round" transform="rotate(${deg.toFixed(0)} ${cx} ${cy})"/>
         </svg>
       `;
     } else if (deviceTypeId === "master_light") {
+      const mLbl = kl[0] || "М";
       inner = `
         <div class="sw-mech-master ${k0On ? "is-key-on" : "is-master-cut"}">
-          <span class="sw-master-symbol">⚡</span>
+          <span class="sw-key-num is-master-num">${escapeHtml(mLbl)}</span>
           <span class="sw-led"></span>
         </div>
       `;
@@ -2225,44 +2272,24 @@
       if (st.isMasterCut) el.classList.add("is-master-cut");
       if (state.selectedSwitchId === sw.id) el.classList.add("is-selected");
 
-      // Realistic square wall mechanism faceplate (ID & status integrated directly inside)
+      // Realistic square wall mechanism faceplate (key numbers rendered directly on keys)
+      const keyLabels = getSwitchKeyLabels(sw);
       const frameHost = document.createElement("div");
       frameHost.innerHTML = renderSwitchFaceplateHtml(dt.id, {
         keyStates: st.keyStates,
         keyCount: keys.length,
+        keyLabels,
         slotEmpty: [isEmptyKey(keys[0]), isEmptyKey(keys[1]), isEmptyKey(keys[2])],
         brightness: firstSetting.brightness,
         rgbColor: firstSetting.color || "#ff3b5c",
         interactiveSlots: !isMasterSwitch(sw),
         slotTitles: [
-          !isEmptyKey(keys[0]) ? `Клавиша 1: ${keys[0].label}` : "Свободная клавиша 1",
-          !isEmptyKey(keys[1]) ? `Клавиша 2: ${keys[1].label}` : "Свободная клавиша 2",
-          !isEmptyKey(keys[2]) ? `Клавиша 3: ${keys[2].label}` : "Свободная клавиша 3"
+          !isEmptyKey(keys[0]) ? `Клавиша ${keyLabels[0] || 1}: ${keys[0].label}` : "Свободная клавиша 1",
+          !isEmptyKey(keys[1]) ? `Клавиша ${keyLabels[1] || 2}: ${keys[1].label}` : "Свободная клавиша 2",
+          !isEmptyKey(keys[2]) ? `Клавиша ${keyLabels[2] || 3}: ${keys[2].label}` : "Свободная клавиша 3"
         ]
       });
       const frameEl = frameHost.firstElementChild;
-
-      const headEl = document.createElement("div");
-      headEl.className = "sw-onkey-head";
-
-      const faceLbl = getSwitchFaceLabel(sw.id);
-      const idSpan = document.createElement("span");
-      idSpan.className = "sw-id";
-      idSpan.textContent = faceLbl;
-      if (faceLbl.length >= 4) idSpan.style.fontSize = faceLbl.length >= 5 ? "8.5px" : "9.5px";
-      headEl.appendChild(idSpan);
-
-      const statusSpan = document.createElement("span");
-      statusSpan.className = "sw-status-icon";
-      statusSpan.textContent = st.isOn ? "✓" : "×";
-      statusSpan.title = isMasterSwitch(sw)
-        ? `Вкл/выкл мастер-свет ${sw.id} (свет №1–39, без вентиляции №40)`
-        : keys.length > 1
-        ? `Вкл/выкл все клавиши ${sw.id}`
-        : `Переключить ${sw.id}`;
-      headEl.appendChild(statusSpan);
-
-      frameEl.appendChild(headEl);
 
       if (sw.doorCheck) {
         const dot = document.createElement("span");
@@ -2378,7 +2405,8 @@
       const miniFaceplate = renderSwitchFaceplateHtml(dt.id, {
         sizeClass: "is-mini",
         keyStates: [powerOn],
-        keyCount: 1
+        keyCount: 1,
+        keyLabels: ["М"]
       });
       const roomOptions = ROOM_ORDER.map(
         (r) => `<option value="${r}" ${sw.room === r ? "selected" : ""}>${r}</option>`
@@ -2390,7 +2418,6 @@
           <div class="pop-title-wrap">
             <div class="pop-id-line">
               ${miniFaceplate}
-              <span class="pop-id-badge">${sw.id}</span>
               <span class="hw-pill hw-${dt.id}">${dt.shortLabel}</span>
               <span class="pop-room-badge">${sw.room}</span>
             </div>
@@ -2487,7 +2514,7 @@
             <button type="button" class="key-row ${on ? "is-on" : ""}" data-toggle-sw-key="${sw.id}" data-toggle-key-idx="${idx}">
               <span class="key-row-main">
                 <span class="drag-grip" title="Перетащите на другую клавишу (поменять местами) или на другой выключатель">⠿</span>
-                ${showSlotTag ? `<span class="key-slot-tag">Кл.${idx + 1}</span>` : ""}
+                ${showSlotTag ? `<span class="key-slot-tag">Клавиша ${escapeHtml(getKeyPlanNum(sw.id, idx, k.key))}</span>` : ""}
                 <span class="key-state-pill">${on ? "✓" : "×"}</span>
                 <span class="key-info">
                   <span class="key-label">${escapeHtml(k.label)}</span>
@@ -2535,6 +2562,7 @@
       sizeClass: "is-mini",
       keyStates: st.keyStates,
       keyCount: keys.length,
+      keyLabels: getSwitchKeyLabels(sw),
       slotEmpty: [isEmptyKey(keys[0]), isEmptyKey(keys[1]), isEmptyKey(keys[2])],
       brightness: firstSetting.brightness,
       rgbColor: firstSetting.color || "#ff3b5c"
@@ -2545,7 +2573,6 @@
         <div class="pop-title-wrap">
           <div class="pop-id-line">
             ${miniFaceplate}
-            <span class="pop-id-badge">${sw.id}</span>
             <span class="hw-pill hw-${dt.id}">${dt.shortLabel}</span>
             <span class="pop-room-badge">${sw.room}</span>
           </div>
@@ -2679,20 +2706,19 @@
 
   function renderDemoSwitchHudHtml(sw) {
     const dt = getEffectiveDeviceType(sw);
-    const ch = getSwitchChannelInfo(sw.id);
-    const faceLbl = getSwitchFaceLabel(sw.id);
     if (isMasterSwitch(sw)) {
       const powerOn = isMasterPowerActive();
       const miniFaceplate = renderSwitchFaceplateHtml(dt.id, {
         sizeClass: "is-mini",
         keyStates: [powerOn],
-        keyCount: 1
+        keyCount: 1,
+        keyLabels: ["М"]
       });
       return `
         <div class="demo-hud-head">
           <div class="demo-hud-badges">
             ${miniFaceplate}
-            <span class="pop-id-badge">Мастер М</span>
+            <span class="hw-pill hw-${dt.id}">${dt.shortLabel}</span>
             <span class="pop-room-badge">${escapeHtml(sw.room)}</span>
           </div>
           <button type="button" class="pop-close" data-close-popover="1" title="Закрыть">✕</button>
@@ -2710,7 +2736,8 @@
     const miniFaceplate = renderSwitchFaceplateHtml(dt.id, {
       sizeClass: "is-mini",
       keyStates,
-      keyCount: Math.max(keys.length, dt.maxRecommendedKeys || 1)
+      keyCount: Math.max(keys.length, dt.maxRecommendedKeys || 1),
+      keyLabels: getSwitchKeyLabels(sw)
     });
 
     const keysButtonsHtml = keys.length
@@ -2757,7 +2784,6 @@
       <div class="demo-hud-head">
         <div class="demo-hud-badges">
           ${miniFaceplate}
-          <span class="pop-id-badge">Выкл. ${(ch && ch.planLabel) || faceLbl}</span>
           <span class="hw-pill hw-${dt.id}">${dt.shortLabel}</span>
           <span class="pop-room-badge">${escapeHtml(sw.room)}</span>
         </div>
@@ -2939,7 +2965,7 @@
                 <button type="button" class="chip-row ${on ? "is-on" : ""}" draggable="true" data-drag-from-switch="${sw.id}" data-drag-key-index="${idx}" data-drop-key-sw="${sw.id}" data-drop-key-idx="${idx}" data-toggle-sw-key="${sw.id}" data-toggle-key-idx="${idx}">
                   <span class="chip-left">
                     <span class="drag-grip" title="Перетащите на другую клавишу (поменять местами) или на другой выключатель">⠿</span>
-                    ${showSlotTag ? `<span class="chip-slot-tag">Кл.${idx + 1}</span>` : ""}
+                    ${showSlotTag ? `<span class="chip-slot-tag">Клавиша ${escapeHtml(getKeyPlanNum(sw.id, idx, k.key))}</span>` : ""}
                     <span class="chip-badge ${on ? "is-on" : "is-off"}">${on ? "✓" : "×"}</span>
                     <span>${targets.join("+")}: ${escapeHtml(k.label)}</span>
                   </span>
@@ -2957,6 +2983,7 @@
             sizeClass: "is-mini",
             keyStates: st.keyStates,
             keyCount: keys.length,
+            keyLabels: getSwitchKeyLabels(sw),
             slotEmpty: [isEmptyKey(keys[0]), isEmptyKey(keys[1]), isEmptyKey(keys[2])],
             brightness: firstSetting.brightness,
             rgbColor: firstSetting.color || "#ff3b5c"
@@ -2973,8 +3000,8 @@
                 <div class="switch-card-left">
                   <span class="mini-status ${st.isOn ? "is-on" : "is-off"}">${st.isOn ? "✓" : "×"}</span>
                   ${miniFace}
-                  <span class="switch-card-title">${sw.id}</span>
                   <span class="hw-pill hw-${dt.id}">${dt.shortLabel}</span>
+                  <span class="pop-room-badge">${escapeHtml(sw.room)}</span>
                 </div>
                 <span class="chip-fixtures">${fixStr || "пусто"}</span>
               </div>

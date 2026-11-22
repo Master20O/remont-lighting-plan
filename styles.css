@@ -612,10 +612,10 @@ body {
 /* Square Wall Frame & Mechanism Plates */
 .sw-frame {
   position: relative;
-  width: 54px;
-  height: 54px;
-  padding: 3.5px;
-  border-radius: 9px;
+  width: 44px;
+  height: 42px;
+  padding: 3px;
+  border-radius: 8px;
   border: 2.2px solid #334155;
   background: linear-gradient(145deg, #ffffff, #e2e8f0);
   box-shadow: 0 4px 12px rgba(15, 23, 42, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.95);
@@ -624,6 +624,77 @@ body {
   justify-content: stretch;
   flex-shrink: 0;
   transition: transform 0.12s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+}
+
+.sw-frame.type-rocker_3:not(.is-mini):not(.is-legend) {
+  width: 58px;
+}
+
+/* Numbers printed directly on physical switch keys / buttons / rotary knobs */
+.sw-key-num {
+  font-size: 14.5px;
+  font-weight: 900;
+  color: #0f172a;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  margin: auto 0;
+  pointer-events: none;
+  user-select: none;
+}
+
+.sw-half-key .sw-key-num {
+  font-size: 13px;
+}
+
+.sw-half-key .sw-key-num.is-2ch {
+  font-size: 10.5px;
+  letter-spacing: -0.06em;
+}
+
+.sw-third-key .sw-key-num {
+  font-size: 10.5px;
+  letter-spacing: -0.06em;
+}
+
+.sw-key-num.is-btn1-num {
+  font-size: 9.5px;
+  color: #1e3a8a;
+  letter-spacing: -0.05em;
+}
+
+.sw-key-num.is-btn2-num {
+  font-size: 10px;
+  color: #1e3a8a;
+  letter-spacing: -0.05em;
+}
+
+.is-key-on .sw-key-num.is-btn1-num,
+.is-key-on .sw-key-num.is-btn2-num {
+  color: #14532d;
+}
+
+.sw-key-num.is-master-num {
+  font-size: 15px;
+  color: #ffffff;
+}
+
+.sw-frame.is-mini .sw-key-num {
+  font-size: 9px;
+}
+
+.sw-frame.is-mini .sw-key-num.is-master-num {
+  font-size: 10px;
+}
+
+.sw-frame.is-legend .sw-key-num.is-master-num {
+  font-size: 9px;
+}
+
+.sw-frame.is-mini .sw-half-key .sw-key-num,
+.sw-frame.is-mini .sw-third-key .sw-key-num,
+.sw-frame.is-mini .sw-key-num.is-btn1-num,
+.sw-frame.is-mini .sw-key-num.is-btn2-num {
+  font-size: 7.5px;
 }
 
 .switch-marker:hover .sw-frame {
@@ -963,8 +1034,12 @@ body {
 }
 
 .sw-frame.is-mini .sw-push-cap-sm {
-  width: 7px;
-  height: 7px;
+  width: 10px;
+  height: 14px;
+  border-radius: 3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   border-width: 1.2px;
 }
 
@@ -1100,14 +1175,21 @@ body {
 }
 
 .sw-frame:not(.is-mini):not(.is-legend) .sw-mech-button1 {
-  align-items: flex-end;
-  padding-bottom: 3px;
+  align-items: center;
+  padding-bottom: 0;
 }
 
 .sw-frame:not(.is-mini):not(.is-legend) .sw-push-cap {
-  width: 20px;
-  height: 20px;
+  width: 28px;
+  height: 26px;
+  border-radius: 13px;
   border-width: 2px;
+}
+
+.sw-frame:not(.is-mini):not(.is-legend) .sw-push-cap.is-pill-cap {
+  width: 34px;
+  height: 24px;
+  border-radius: 8px;
 }
 
 .sw-frame:not(.is-mini):not(.is-legend) .sw-push-dot {
@@ -1116,13 +1198,17 @@ body {
 }
 
 .sw-frame:not(.is-mini):not(.is-legend) .sw-btn-half {
-  align-items: flex-end;
-  padding-bottom: 4px;
+  align-items: center;
+  padding-bottom: 0;
 }
 
 .sw-frame:not(.is-mini):not(.is-legend) .sw-push-cap-sm {
-  width: 12px;
-  height: 12px;
+  width: 16px;
+  height: 24px;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .sw-frame:not(.is-mini):not(.is-legend) .sw-rgb-face {
