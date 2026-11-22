@@ -273,14 +273,14 @@
       </nav>
     </div>
     <div class="toolbar-actions">
-      <a class="btn btn-back" href="assets/electrician_smartphone.html?v=7" download="Интерактивная_схема_для_смартфона.html">📱 Скачать на смартфон</a>
-      <a class="btn btn-file" href="assets/electrician_album_final.pdf?v=7" target="_blank">📄 Альбом PDF</a>
-      <a class="btn btn-file" href="assets/electrician_plan_final.png?v=7" target="_blank">🖼️ Чертёж PNG</a>
-      <a class="btn btn-file" href="assets/electrician_tables_final.xlsx?v=7" download>📊 Excel</a>
-      <a class="btn btn-file" href="assets/electrician_points_final.csv?v=7" download>📋 CSV точки</a>
-      <a class="btn btn-file" href="assets/electrician_spec_final.md?v=7" target="_blank">📝 ТЗ (MD)</a>
+      <a class="btn btn-back" href="assets/electrician_smartphone.html?v=8" download="Интерактивная_схема_для_смартфона.html">📱 Скачать на смартфон</a>
+      <a class="btn btn-file" href="assets/electrician_album_final.pdf?v=8" target="_blank">📄 Альбом PDF</a>
+      <a class="btn btn-file" href="assets/electrician_plan_final.png?v=8" target="_blank">🖼️ Чертёж PNG</a>
+      <a class="btn btn-file" href="assets/electrician_tables_final.xlsx?v=8" download>📊 Excel</a>
+      <a class="btn btn-file" href="assets/electrician_points_final.csv?v=8" download>📋 CSV точки</a>
+      <a class="btn btn-file" href="assets/electrician_spec_final.md?v=8" target="_blank">📝 ТЗ (MD)</a>
       <button type="button" class="btn btn-print" onclick="window.print()">🖨️ Печать / PDF</button>
-      <a class="btn btn-back" href="index.html?v=7">← Симулятор</a>
+      <a class="btn btn-back" href="index.html?v=8">← Симулятор</a>
     </div>
   </header>
 
@@ -296,7 +296,7 @@
         <span class="sheet-badge">Лист 1 / 5</span>
       </div>
       <div class="plan-wrap">
-        <img src="assets/electrician_plan_final.png?v=7" alt="Итоговый чертёж освещения для электрика">
+        <img src="assets/electrician_plan_final.png?v=8" alt="Итоговый чертёж освещения для электрика">
       </div>
     </section>
 
@@ -429,7 +429,7 @@
     </section>
   </main>
 
-  <script src="data.js?v=7"></script>
+  <script src="data.js?v=8"></script>
   <script>
     (function () {
       const D = window.LIGHTING_DATA;
@@ -440,7 +440,7 @@
       let fromStorage = false;
 
       try {
-        const raw = localStorage.getItem("lighting_editor_v7_state");
+        const raw = localStorage.getItem("lighting_editor_v8_state");
         if (raw) {
           const parsed = JSON.parse(raw);
           if (Array.isArray(parsed.switches) && parsed.switches.length) {
@@ -454,7 +454,7 @@
       if (fromStorage) {
         const note = document.getElementById("sync-note");
         note.style.display = "flex";
-        note.innerHTML = '<span>ℹ️ Отображены позиции и привязки с учётом ваших локальных изменений из симулятора (<code>lighting_editor_v7_state</code>).</span>';
+        note.innerHTML = '<span>ℹ️ Отображены позиции и привязки с учётом ваших локальных изменений из симулятора (<code>lighting_editor_v8_state</code>).</span>';
       }
 
       const esc = (s) => String(s || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");

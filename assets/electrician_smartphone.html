@@ -3581,10 +3581,10 @@ window.LIGHTING_DATA = {
       name: "Подсветка зеркала (встроенная)",
       type: "Встроенная LED-подсветка настенного зеркала над раковиной",
       groups: ["SU-04"],
-      cx: 624,
-      cy: 1212,
+      cx: 628,
+      cy: 1132,
       r: 14.5,
-      shape: { kind: "mirror", x: 604, y: 1128, w: 82, h: 10, rx: 4 }
+      shape: { kind: "mirror", x: 582, y: 1120, w: 92, h: 24, rx: 5 }
     },
     {
       id: 40,
@@ -4130,8 +4130,8 @@ window.LIGHTING_DATA = {
       id: "B13",
       room: "Санузел",
       title: "Санузел — у раковины (спот №19–21, свет №18 и подсветка зеркала №39)",
-      x: 707,
-      y: 1165,
+      x: 710,
+      y: 1166,
       deviceType: "rocker_3",
       heightNote: "Предварительно, ~90–100 см у зеркала/раковины (влагозащищённый IP44+)",
       doorCheck: false,
@@ -5751,7 +5751,7 @@ window.LIGHTING_MOUNTING = {
       "y2": 1068,
       "label": "1 150 ось",
       "ext1": 1120,
-      "ext2": 1135,
+      "ext2": 1118,
       "dx": -10,
       "zone": "Санузел"
     },
@@ -5761,7 +5761,7 @@ window.LIGHTING_MOUNTING = {
       "x2": 720,
       "y2": 1068,
       "label": "380 (200 угол)",
-      "ext1": 1135,
+      "ext1": 1118,
       "ext2": 1149,
       "dx": 24,
       "dy": -20,
@@ -6022,7 +6022,7 @@ window.LIGHTING_MOUNTING = {
   }
 
   const SVG_NS = "http://www.w3.org/2000/svg";
-  const STORAGE_KEY = "lighting_editor_v7_state";
+  const STORAGE_KEY = "lighting_editor_v8_state";
   const ROOM_ORDER = ["Прихожая", "Кладовая", "Зал", "Кухня", "Балкон", "Санузел", "Спальня"];
   const CIRCUIT_COLORS = ["#facc15", "#fb923c", "#38bdf8"];
 
@@ -7316,50 +7316,17 @@ window.LIGHTING_MOUNTING = {
       const ms = mirrorFx.shape;
       planAdditionsLayerEl.appendChild(
         createSvgEl("rect", {
-          x: ms.x - 2,
-          y: ms.y - 2,
-          width: ms.w + 4,
-          height: ms.h + 4,
-          rx: (ms.rx || 4) + 1,
+          x: ms.x - 3,
+          y: ms.y - 3,
+          width: ms.w + 6,
+          height: ms.h + 6,
+          rx: (ms.rx || 5) + 2,
           fill: "none",
           stroke: "#38bdf8",
           "stroke-width": 1.6,
           "stroke-dasharray": "4 3"
         })
       );
-      planAdditionsLayerEl.appendChild(
-        createSvgEl("rect", {
-          x: ms.x,
-          y: ms.y,
-          width: ms.w,
-          height: ms.h,
-          rx: ms.rx || 4,
-          fill: "#e0f2fe",
-          stroke: "#0284c7",
-          "stroke-width": 2
-        })
-      );
-      planAdditionsLayerEl.appendChild(
-        createSvgEl("line", {
-          x1: mirrorFx.cx,
-          y1: mirrorFx.cy - mirrorFx.r,
-          x2: mirrorFx.cx,
-          y2: ms.y + ms.h + 2,
-          stroke: "#38bdf8",
-          "stroke-width": 1.5,
-          "stroke-dasharray": "3 3"
-        })
-      );
-      const mLabel = createSvgEl("text", {
-        x: ms.x + ms.w / 2 + 12,
-        y: ms.y + ms.h + 10,
-        "text-anchor": "middle",
-        fill: "#0369a1",
-        "font-size": 9,
-        "font-weight": 800
-      });
-      mLabel.textContent = "ЗЕРК.";
-      planAdditionsLayerEl.appendChild(mLabel);
     }
 
     const ventFx = fixturesById.get(40);
@@ -7595,7 +7562,11 @@ window.LIGHTING_MOUNTING = {
       DATA.fixtures.forEach((f) => {
         const fxInfo = mounting.fixtures && mounting.fixtures[String(f.id)];
         if (fxInfo && fxInfo.heightLabel && fxInfo.heightLabel !== "потолок") {
-          drawHeightTag(f.cx, f.cy - f.r - 12, fxInfo.heightLabel, false);
+          if (f.id === 39 && f.shape && f.shape.kind === "mirror") {
+            drawHeightTag(f.shape.x - 30, f.shape.y + f.shape.h / 2, fxInfo.heightLabel, false);
+          } else {
+            drawHeightTag(f.cx, f.cy - f.r - 12, fxInfo.heightLabel, false);
+          }
         }
       });
 
@@ -7774,17 +7745,6 @@ window.LIGHTING_MOUNTING = {
             stroke: col,
             "stroke-width": 4,
             filter: customColor ? "url(#glow-rgb)" : "url(#glow-warm)"
-          })
-        );
-        glowLayerEl.appendChild(
-          createSvgEl("circle", {
-            cx: f.cx,
-            cy: f.cy,
-            r: f.r + 7,
-            fill: hexToRgba(col, 0.34 * briFactor),
-            stroke: col,
-            "stroke-width": 3,
-            filter: "url(#glow-warm)"
           })
         );
       } else if (s.kind === "vent") {
@@ -8036,6 +7996,35 @@ window.LIGHTING_MOUNTING = {
           "dominant-baseline": "central",
           fill: textFill,
           "font-size": 14
+        });
+        numText.textContent = planNum;
+        hitGroup.appendChild(numText);
+      } else if (f.shape && f.shape.kind === "mirror") {
+        const ms = f.shape;
+        const mFill = isOn ? (customColor ? "#ffffff" : "#fef08a") : "#e0f2fe";
+        const mStroke = isOn ? (customColor || "#ca8a04") : "#0284c7";
+        const mText = isOn ? "#713f12" : "#0c4a6e";
+        hitGroup.appendChild(
+          createSvgEl("rect", {
+            class: "fixture-badge-circle",
+            x: ms.x,
+            y: ms.y,
+            width: ms.w,
+            height: ms.h,
+            rx: ms.rx || 5,
+            fill: mFill,
+            stroke: mStroke,
+            "stroke-width": isOn ? 3.2 : 2.2
+          })
+        );
+        const numText = createSvgEl("text", {
+          class: "fixture-badge-num",
+          x: ms.x + ms.w / 2,
+          y: ms.y + ms.h / 2,
+          "text-anchor": "middle",
+          "dominant-baseline": "central",
+          fill: mText,
+          "font-size": 15
         });
         numText.textContent = planNum;
         hitGroup.appendChild(numText);
