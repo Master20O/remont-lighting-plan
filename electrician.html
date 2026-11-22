@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Документация для электрика — BM, B1–B25 / 38 точек света + вентиляция №40</title>
+  <title>Документация для электрика — клавиши и светильники 1–27 + мастер М</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='14' fill='%231e3a8a'/%3E%3Cpath d='M9 16h14M16 9v14' stroke='%23fff' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E">
   <style>
     :root {
@@ -268,19 +268,19 @@
         <a href="#sec-plan">План</a>
         <a href="#sec-switches">Выключатели (23)</a>
         <a href="#sec-fixtures">Точки (39)</a>
-        <a href="#sec-groups">Группы и треки (35)</a>
+        <a href="#sec-groups">Линии 1–27 + М (28)</a>
         <a href="#sec-notes">Щит и монтаж</a>
       </nav>
     </div>
     <div class="toolbar-actions">
-      <a class="btn btn-back" href="assets/electrician_smartphone.html?v=6" download="Интерактивная_схема_для_смартфона.html">📱 Скачать на смартфон</a>
-      <a class="btn btn-file" href="assets/electrician_album_final.pdf?v=6" target="_blank">📄 Альбом PDF</a>
-      <a class="btn btn-file" href="assets/electrician_plan_final.png?v=6" target="_blank">🖼️ Чертёж PNG</a>
-      <a class="btn btn-file" href="assets/electrician_tables_final.xlsx" download>📊 Excel</a>
-      <a class="btn btn-file" href="assets/electrician_points_final.csv" download>📋 CSV точки</a>
-      <a class="btn btn-file" href="assets/electrician_spec_final.md" target="_blank">📝 ТЗ (MD)</a>
+      <a class="btn btn-back" href="assets/electrician_smartphone.html?v=7" download="Интерактивная_схема_для_смартфона.html">📱 Скачать на смартфон</a>
+      <a class="btn btn-file" href="assets/electrician_album_final.pdf?v=7" target="_blank">📄 Альбом PDF</a>
+      <a class="btn btn-file" href="assets/electrician_plan_final.png?v=7" target="_blank">🖼️ Чертёж PNG</a>
+      <a class="btn btn-file" href="assets/electrician_tables_final.xlsx?v=7" download>📊 Excel</a>
+      <a class="btn btn-file" href="assets/electrician_points_final.csv?v=7" download>📋 CSV точки</a>
+      <a class="btn btn-file" href="assets/electrician_spec_final.md?v=7" target="_blank">📝 ТЗ (MD)</a>
       <button type="button" class="btn btn-print" onclick="window.print()">🖨️ Печать / PDF</button>
-      <a class="btn btn-back" href="index.html?v=6">← Симулятор</a>
+      <a class="btn btn-back" href="index.html?v=7">← Симулятор</a>
     </div>
   </header>
 
@@ -296,7 +296,7 @@
         <span class="sheet-badge">Лист 1 / 5</span>
       </div>
       <div class="plan-wrap">
-        <img src="assets/electrician_plan_final.png?v=6" alt="Итоговый чертёж освещения для электрика">
+        <img src="assets/electrician_plan_final.png?v=7" alt="Итоговый чертёж освещения для электрика">
       </div>
     </section>
 
@@ -311,12 +311,11 @@
       <table>
         <thead>
           <tr>
-            <th>Клавиши (Пост)</th>
+            <th>На клавишах</th>
             <th>Помещение</th>
             <th>Расположение и блок рамок</th>
             <th>Механизм</th>
-            <th>Управляемые линии</th>
-            <th>Номера на плане</th>
+            <th>Что включает клавиша (номер на плане)</th>
             <th>Высота</th>
             <th>Дверь / примечание</th>
           </tr>
@@ -336,11 +335,10 @@
       <table>
         <thead>
           <tr>
-            <th>№ план (исх.)</th>
+            <th>№ (кл.)</th>
             <th>Пом.</th>
             <th>Тип прибора и монтажа</th>
-            <th>Группа</th>
-            <th>Клавиша (Пост)</th>
+            <th>Клавиша на выключателе</th>
             <th>Кабель и питание</th>
             <th>Мастер М</th>
             <th>Примечание электрику</th>
@@ -353,21 +351,21 @@
     <section id="sec-groups" class="sheet">
       <div class="sheet-head">
         <div>
-          <h2>ВЕДОМОСТЬ ГРУПП УПРАВЛЕНИЯ (35 КАНАЛОВ) И ТРЁХКОНТУРНЫХ ТРЕКОВ 230 В</h2>
-          <p>34 канала освещения под контактором BM (М) + 1 канал вентиляции санузла мимо контактора</p>
+          <h2>ВЕДОМОСТЬ ЛИНИЙ И КАНАЛОВ 1–27 + МАСТЕР М (28 ЛИНИЙ)</h2>
+          <p>Свет 1–20, 22–27 под контактором М · вентилятор 21 и все розетки питаются ДО контактора М</p>
         </div>
         <span class="sheet-badge">Лист 4 / 5</span>
       </div>
       <table>
         <thead>
           <tr>
-            <th>Группа</th>
+            <th>№ (кл.)</th>
             <th>Пом.</th>
-            <th>Точки</th>
-            <th>Назначение</th>
-            <th>Посты</th>
+            <th>Клавиша / выключатель</th>
+            <th>Управляемые светильники (на плане)</th>
             <th>Автоматика / способ коммутации</th>
-            <th>Линия в щите (BM)</th>
+            <th>Кабель и подключение</th>
+            <th>Мастер М</th>
           </tr>
         </thead>
         <tbody id="tbody-groups"></tbody>
@@ -384,10 +382,10 @@
       </div>
       <div class="cards-grid">
         <div class="card is-red">
-          <div class="card-hdr">1. Мастер-выключатель BM и неотключаемые линии</div>
+          <div class="card-hdr">1. Мастер-выключатель М и неотключаемые линии</div>
           <div class="card-body">
             <ul>
-              <li><strong>Позиция М (BM):</strong> прихожая, нижняя стена (центр 460 мм), <strong>отдельно от выкл. 1</strong>, высота <strong>145 см</strong>.</li>
+              <li><strong>Позиция М:</strong> прихожая, нижняя стена (центр 460 мм), <strong>отдельно от выкл. 1</strong>, высота <strong>145 см</strong>.</li>
               <li><strong>Схема в щите:</strong> управляет модульным контактором (25–40 А, катушка 230 В). Разрывает <strong>только световые линии 1–20, 22–27</strong> (положение комнатных клавиш сохраняется).</li>
               <li><strong>СТРОГО ДО контактора М (неотключаемые):</strong>
                 все розетки (холодильник, Wi‑Fi роутер, автокормушки/автопоилки), скрытая розетка кухонной вытяжки <code>3×2,5 мм²</code>, вытяжка санузла <strong>21</strong>, тёплые полы, полотенцесушитель, защита от протечек, кондиционер.</li>
@@ -398,7 +396,7 @@
           <div class="card-hdr">2. Импульсные (бистабильные) реле: Балкон и Спальня</div>
           <div class="card-body">
             <ul>
-              <li><strong>Балкон (15, 16):</strong> местный пост <code>15·16</code> (B12) переключает центр <code>15</code> и двойной спот <code>16</code> раздельно. Общая кнопка <code>15+16</code> (B11) у перехода: если оба выкл. → включает оба; если вкл. хотя бы один → выключает оба.</li>
+              <li><strong>Балкон (15, 16):</strong> местная 2-кл. кнопка <code>15 | 16</code> переключает центр <code>15</code> и двойной спот <code>16</code> раздельно. Общая кнопка <code>15+16</code> в 5-рамке у перехода: если оба выкл. → включает оба; если вкл. хотя бы один → выключает оба.</li>
               <li><strong>Спальня (24, 25):</strong> две 2-клавишные импульсные кнопки <code>24·25</code> у противоположных тумб (h=671) параллельно в щит на 2 канала бистабильного реле:
                 <br>— клавиша <strong>24</strong> на обоих постах переключает левые бра <code>24</code> (h=1700);
                 <br>— клавиша <strong>25</strong> на обоих постах переключает нижние бра <code>25</code> (h=1700).</li>
@@ -431,27 +429,23 @@
     </section>
   </main>
 
-  <script src="data.js?v=6"></script>
+  <script src="data.js?v=7"></script>
   <script>
     (function () {
       const D = window.LIGHTING_DATA;
       if (!D) return;
 
       let switches = JSON.parse(JSON.stringify(D.switches));
-      let groups = JSON.parse(JSON.stringify(D.groups));
       let fxComments = {};
       let fromStorage = false;
 
       try {
-        const raw = localStorage.getItem("lighting_editor_v4_state");
+        const raw = localStorage.getItem("lighting_editor_v7_state");
         if (raw) {
           const parsed = JSON.parse(raw);
           if (Array.isArray(parsed.switches) && parsed.switches.length) {
             switches = parsed.switches;
             fromStorage = true;
-          }
-          if (Array.isArray(parsed.groups) && parsed.groups.length) {
-            groups = parsed.groups;
           }
           if (parsed.fixtureComments) fxComments = parsed.fixtureComments;
         }
@@ -460,154 +454,101 @@
       if (fromStorage) {
         const note = document.getElementById("sync-note");
         note.style.display = "flex";
-        note.innerHTML = '<span>ℹ️ Отображены позиции и привязки с учётом ваших локальных изменений из симулятора (<code>lighting_editor_v4_state</code>).</span>';
+        note.innerHTML = '<span>ℹ️ Отображены позиции и привязки с учётом ваших локальных изменений из симулятора (<code>lighting_editor_v7_state</code>).</span>';
       }
 
-      const gMap = new Map(groups.map((g) => [g.id, g]));
       const esc = (s) => String(s || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-      const getTargets = (k) => (Array.isArray(k.targets) && k.targets.length ? k.targets : k.group === "BAL-ALL" ? ["BAL-01", "BAL-02"] : k.group ? [k.group] : []);
-
-      const blocks = {
-        B1: ["У входной двери (1 рамка)", "~90 см"],
-        BM: ["Нижняя стена прихожей, отдельно от B1 (1 рамка)", "~140–150 см"],
-        B2: ["У проёма кладовой (1 рамка)", "~90 см"],
-        B3: ["5-постовая рамка Зал/Кухня B3+B4+B9+B11+B8 (пост 1)", "~90 см"],
-        B4: ["5-постовая рамка Зал/Кухня B3+B4+B9+B11+B8 (пост 2)", "~90 см"],
-        B9: ["5-постовая рамка Зал/Кухня B3+B4+B9+B11+B8 (пост 3)", "~90 см"],
-        B11: ["5-постовая рамка Зал/Кухня B3+B4+B9+B11+B8 (пост 4)", "~90 см"],
-        B8: ["5-постовая рамка Зал/Кухня B3+B4+B9+B11+B8 (пост 5)", "~90 см"],
-        B7: ["3-постовой вертик. блок в зале B7+B6+B5 (верх)", "~90–110 см"],
-        B6: ["3-постовой вертик. блок в зале B7+B6+B5 (центр)", "~90–110 см"],
-        B5: ["3-постовой вертик. блок в зале B7+B6+B5 (низ)", "~90–110 см"],
-        B10: ["У рабочей зоны / фартука кухни (1 рамка)", "~100–110 см"],
-        B12: ["Местный пост на балконе (1 рамка)", "~90 см"],
-        B13: ["Внутри санузла у раковины, IP44+ (1 рамка)", "~90–100 см"],
-        B14: ["2-постовая рамка у входа в санузел B14+B20 (пост 1)", "~90 см"],
-        B20: ["2-постовая рамка у входа в санузел B14+B20 (пост 2, мимо BM)", "~90 см"],
-        B16: ["У входа в спальню (1 рамка)", "~90 см"],
-        B21: ["Верт. 3-постовая рамка тумба 1 B21/B22/B23 (верхний пост)", "h=742 мм"],
-        B22: ["Верт. 3-постовая рамка тумба 1 B21/B22/B23 (средний пост)", "h=671 мм"],
-        B23: ["Верт. 3-постовая рамка тумба 1 B21/B22/B23 (нижний пост)", "h=600 мм"],
-        B25: ["Верт. 3-постовая рамка тумба 2 B25/B24/B19 (верхний пост)", "h=742 мм"],
-        B24: ["Верт. 3-постовая рамка тумба 2 B25/B24/B19 (средний пост)", "h=671 мм"],
-        B19: ["Верт. 3-постовая рамка тумба 2 B25/B24/B19 (нижний пост)", "h=600 мм"]
-      };
 
       const cableFor = (fx) => {
         const id = fx.id;
         if ([32, 33, 35].includes(id)) return ["ВВГнг(А)-LS 5×1,5 мм² (L1, L2, L3, N, PE)", "3 контура 230 В"];
-        if (id === 40) return ["ВВГнг(А)-LS 4×1,5 мм² (L пост. + L1 от B20 + N + PE)", "Вытяжка санузла; 4 жилы под таймер"];
+        if (id === 40) return ["ВВГнг(А)-LS 4×1,5 мм² (L пост. + L1 от выкл. 21 + N + PE)", "Вытяжка санузла; 4 жилы под таймер"];
         if ([15, 26].includes(id)) return ["3×1,5 мм² к БП + шлейф RGB(W) + упр.", "БП и контроллер в доступном месте"];
         if ([4, 5, 8, 10, 13, 36].includes(id)) return ["3×1,5 мм² к БП 12/24 В + 2×1,5 мм² к ленте", "БП с запасом 25–30%"];
         if (id === 39) return ["ВВГнг(А)-LS 3×1,5 мм² за зеркало", "Зона IP44+"];
         return ["ВВГнг(А)-LS 3×1,5 мм²", "Стандартная линия 230 В"];
       };
 
-      // Render Switches Table
-      const M = window.LIGHTING_MOUNTING || { switches: {}, fixtures: {}, fixtureChannel: {}, switchChannel: {} };
+      // Render Switches Table (unified numbering 1–27 + М ONLY, zero B#)
+      const M = window.LIGHTING_MOUNTING || { switches: {}, fixtures: {}, fixtureChannel: {}, switchChannel: {}, unifiedLines: [] };
       const fChan = (id) => (M.fixtureChannel && M.fixtureChannel[String(id)]) || String(id);
       const sChan = (id) => (M.switchChannel && M.switchChannel[id]) || null;
+      const uMap = new Map((M.unifiedLines || []).map((u) => [u.num, u]));
+
       document.getElementById("tbody-switches").innerHTML = switches.map((sw) => {
         const dt = D.deviceTypes[sw.deviceType] || {};
-        const blk = blocks[sw.id] || [`Позиция (${sw.x}, ${sw.y})`, "~90 см"];
         const mSw = (M.switches && M.switches[sw.id]) || null;
         const ch = sChan(sw.id);
         let keysHtml = "";
-        let fxStr = "";
         if (sw.isMaster) {
-          keysHtml = "Клавиша М: все 34 группы света 1–20, 22–27 (через контактор)";
-          fxStr = "1–20, 22–27 (розетки и 21 мимо)";
-        } else {
-          const ks = [];
-          const fids = new Set();
-          (sw.keys || []).forEach((k, idx) => {
-            const tgs = getTargets(k);
-            const kFids = [...new Set(tgs.flatMap((gid) => (gMap.get(gid) ? gMap.get(gid).fixtures : [])))].sort((a, b) => a - b);
-            kFids.forEach((n) => fids.add(n));
-            const kLabel = ch && ch.keyNums && ch.keyNums[idx] ? `Кл. ${ch.keyNums[idx]}` : `Кл.${k.key}`;
-            ks.push(`<b>${esc(kLabel)}:</b> ${esc(tgs.join("+"))} (план: ${[...new Set(kFids.map(fChan))].join(", ")})`);
-          });
-          keysHtml = ks.join("<br>") || "—";
-          fxStr = (ch && ch.planLabel) ? ch.planLabel : ([...fids].sort((a, b) => a - b).map(fChan).join(", ") || "—");
+          keysHtml = "Клавиша М: отключает весь свет 1–20, 22–27 (через контактор в щите; розетки и 21 ДО М)";
+        } else if (ch && Array.isArray(ch.keyNums)) {
+          keysHtml = ch.keyNums.map((kNum) => {
+            if (kNum === "15+16") {
+              return `<b>Кнопка 15+16:</b> включает/выключает сразу оба света балкона (15 и 16)`;
+            }
+            const ul = uMap.get(kNum);
+            return `<b>Клавиша ${esc(kNum)}:</b> ${esc(ul ? ul.fixtureSpec : (ch.targetsSummary || ""))}`;
+          }).join("<br>");
         }
         const cls = sw.isMaster ? "row-master" : sw.id === "B20" ? "row-vent" : "";
-        const doorTxt = sw.doorCheck ? `<b>ДА:</b> ${esc(sw.doorNote)}` : (sw.comment ? esc(sw.comment) : "Нет");
+        const doorTxt = (mSw && mSw.doorClean) ? esc(mSw.doorClean) : (sw.doorCheck ? `<b>ДА</b>` : "Нет");
+        const blockTxt = (mSw && mSw.blockClean) || sw.title || "";
         const locHtml = mSw && mSw.chaseSpec
-          ? `${esc(blk[0])}<br><small style="color:#92400e;font-weight:700;">🔨 ${esc(mSw.chaseSpec)}</small>`
-          : esc(blk[0]);
-        const hTxt = (mSw && mSw.heightLabel) ? mSw.heightLabel : blk[1];
-        const postLabel = ch && ch.planLabel ? `<b>${esc(ch.planLabel)}</b> <small style="color:#64748b;">(${esc(sw.id)})</small>` : `<b>${esc(sw.id)}</b>`;
+          ? `${esc(blockTxt)}<br><small style="color:#92400e;font-weight:700;">🔨 ${esc(mSw.chaseSpec)}</small>`
+          : esc(blockTxt);
+        const hTxt = (mSw && mSw.heightLabel) ? mSw.heightLabel : "h=900";
+        const postLabel = `<b>${esc((ch && ch.planLabel) || sw.id)}</b>`;
         return `<tr class="${cls}">
           <td>${postLabel}</td>
           <td>${esc(sw.room)}</td>
           <td>${locHtml}</td>
           <td>${esc(dt.fullLabel || sw.deviceType)}</td>
           <td>${keysHtml}</td>
-          <td><b>${esc(fxStr)}</b></td>
           <td><b>${esc(hTxt)}</b></td>
           <td>${doorTxt}</td>
         </tr>`;
       }).join("");
 
-      // Render Fixtures Table
+      // Render Fixtures Table (unified numbering 1–27 ONLY, zero B#/№/group codes)
       document.getElementById("tbody-fixtures").innerHTML = D.fixtures.map((fx) => {
-        const sws = [];
-        switches.forEach((sw) => {
-          if (sw.isMaster) return;
-          const ch = sChan(sw.id);
-          const ks = (sw.keys || [])
-            .map((k, idx) => (getTargets(k).some((gid) => gMap.get(gid) && gMap.get(gid).fixtures.includes(fx.id)) ? (ch && ch.keyNums && ch.keyNums[idx] ? ch.keyNums[idx] : `Кл.${k.key}`) : null))
-            .filter(Boolean);
-          if (ks.length) sws.push(`Кл. ${ks.join(", ")} (${sw.id})`);
-        });
+        const mFx = (M.fixtures && M.fixtures[String(fx.id)]) || null;
+        const pNum = fChan(fx.id);
         const [cab, extraNote] = cableFor(fx);
         const bmBadge = fx.isNonLight ? '<span class="pill pill-vent">МИМО М</span>' : '<span class="pill">Под М</span>';
-        const cmt = fxComments[fx.id] ? `${extraNote}; комм.: ${fxComments[fx.id]}` : extraNote;
-        const mFx = (M.fixtures && M.fixtures[String(fx.id)]) || null;
+        const baseType = (mFx && mFx.typeClean) || fx.type;
+        const baseNote = (mFx && mFx.noteClean) || extraNote;
+        const cmt = fxComments[fx.id] ? `${baseNote}; комм.: ${fxComments[fx.id]}` : baseNote;
+        const swLbl = (mFx && mFx.switchesClean) || `Кл. ${pNum} (${fx.room})`;
         const chaseFxHtml = mFx && mFx.chaseSpec
           ? `<br><small style="color:#92400e;font-weight:700;">🔨 ${esc(mFx.heightLabel || "потолок")} · ${esc(mFx.chaseSpec)}</small>`
           : "";
         return `<tr class="${fx.isNonLight ? "row-vent" : ""}">
-          <td><b>${esc(fChan(fx.id))}</b> <small style="color:#64748b;">(№${fx.id})</small></td>
+          <td><b>${esc(pNum)}</b></td>
           <td>${esc(fx.room)}</td>
-          <td>${esc(fx.type)}</td>
-          <td><code>${esc(fx.groups.join(" / "))}</code></td>
-          <td>${esc(sws.join(", ") || "—")}</td>
+          <td>${esc(baseType)}</td>
+          <td>${esc(swLbl)}</td>
           <td>${esc(cab)}</td>
           <td>${bmBadge}</td>
           <td>${esc(cmt)}${chaseFxHtml}</td>
         </tr>`;
       }).join("");
 
-      // Render Groups Table
-      document.getElementById("tbody-groups").innerHTML = groups.map((g) => {
-        const sws = [];
-        switches.forEach((sw) => {
-          if (sw.isMaster) return;
-          const ch = sChan(sw.id);
-          (sw.keys || []).forEach((k, idx) => {
-            if (getTargets(k).includes(g.id)) {
-              const kNum = ch && ch.keyNums && ch.keyNums[idx] ? ch.keyNums[idx] : `Кл.${k.key}`;
-              sws.push(`Кл. ${kNum} (${sw.id})`);
-            }
-          });
-        });
-        let auto = "Прямая клавиша выключателя";
-        if (g.isNonLight) auto = "Прямое управление выкл. 21 (фаза до контактора М)";
-        else if (["BAL-01", "BAL-02"].includes(g.id)) auto = "Импульсное реле (15·16 локально + 15+16 общая)";
-        else if (["BR-02", "GRP-5", "GRP-6", "GRP-7"].includes(g.id)) auto = "Импульсное реле 2 канала (кнопки 24·25 у обеих тумб синхр.)";
-        else if (g.id === "Z-08") auto = "Поворотно-нажимной RGB-регулятор 10 + контроллер/БП";
-        else if (g.id === "BR-03B") auto = "Два синхронных RGB-регулятора 26";
-        else if (g.track_circuit) auto = `Отдельная фаза контура ${g.track_circuit} трека 230 В (5×1,5 мм²)`;
-        const bm = g.isNonLight ? '<span class="pill pill-vent">МИМО М</span>' : '<span class="pill">Под М</span>';
-        const ptsTxt = [...new Set(g.fixtures.map(fChan))].join(", ") + ` (исх. ${g.fixtures.map((n) => "№" + n).join(", ")})`;
-        return `<tr class="${g.isNonLight ? "row-vent" : ""}">
-          <td><b><code>${esc(g.id)}</code></b></td>
-          <td>${esc(g.room)}</td>
-          <td><b>${esc(ptsTxt)}</b></td>
-          <td>${esc(g.purpose)}</td>
-          <td>${esc(sws.join(", ") || "—")}</td>
-          <td>${esc(auto)}</td>
+      // Render Unified Lines Table (1–27 + М, zero Z-01/B#/№)
+      document.getElementById("tbody-groups").innerHTML = (M.unifiedLines || []).map((ul) => {
+        const cls = ul.num === "21" ? "row-vent" : ul.num === "М" ? "row-master" : "";
+        const bm = ul.num === "21"
+          ? '<span class="pill pill-vent">МИМО М</span>'
+          : ul.num === "М"
+          ? '<span class="pill pill-bm">Мастер-контакт</span>'
+          : '<span class="pill">Под М</span>';
+        return `<tr class="${cls}">
+          <td><b>${esc(ul.num)}</b></td>
+          <td>${esc(ul.room)}</td>
+          <td>${esc(ul.keySpec)}</td>
+          <td><b>${esc(ul.fixtureSpec)}</b></td>
+          <td>${esc(ul.automation)}</td>
+          <td>${esc(ul.cable)}</td>
           <td>${bm}</td>
         </tr>`;
       }).join("");

@@ -8,7 +8,7 @@
   }
 
   const SVG_NS = "http://www.w3.org/2000/svg";
-  const STORAGE_KEY = "lighting_editor_v6_state";
+  const STORAGE_KEY = "lighting_editor_v7_state";
   const ROOM_ORDER = ["Прихожая", "Кладовая", "Зал", "Кухня", "Балкон", "Санузел", "Спальня"];
   const CIRCUIT_COLORS = ["#facc15", "#fb923c", "#38bdf8"];
 
