@@ -265,7 +265,8 @@
     <div class="toolbar-left">
       <div class="toolbar-title">📐 Монтажный комплект электрика (BM, B1–B25)</div>
       <nav class="nav-links">
-        <a href="#sec-plan">План</a>
+        <a href="#sec-plan">План света</a>
+        <a href="#sec-sockets">🔌 Розетки и щит</a>
         <a href="#sec-switches">Выключатели (23)</a>
         <a href="#sec-fixtures">Точки (39)</a>
         <a href="#sec-groups">Группы и треки (35)</a>
@@ -275,7 +276,8 @@
     <div class="toolbar-actions">
       <a class="btn btn-back" href="assets/electrician_smartphone.html" download="Интерактивная_схема_для_смартфона.html">📱 Скачать на смартфон</a>
       <a class="btn btn-file" href="assets/electrician_album_final.pdf" target="_blank">📄 Альбом PDF</a>
-      <a class="btn btn-file" href="assets/electrician_plan_final.png" target="_blank">🖼️ Чертёж PNG</a>
+      <a class="btn btn-file" href="assets/electrician_plan_final.png" target="_blank">🖼️ Чертёж света</a>
+      <a class="btn btn-file" href="assets/electrician_sockets_plan.png" target="_blank">🔌 Розетки PNG</a>
       <a class="btn btn-file" href="assets/electrician_tables_final.xlsx" download>📊 Excel</a>
       <a class="btn btn-file" href="assets/electrician_points_final.csv" download>📋 CSV точки</a>
       <a class="btn btn-file" href="assets/electrician_spec_final.md" target="_blank">📝 ТЗ (MD)</a>
@@ -293,11 +295,49 @@
           <h2>СВОДНЫЙ ПЛАН ОСВЕЩЕНИЯ, ВЕНТИЛЯЦИИ №40 И ВЫКЛЮЧАТЕЛЕЙ (BM, B1–B25)</h2>
           <p>38 точек освещения (№1–22, 24–39; №23 исключена) + 1 вытяжка санузла (№40) · 35 каналов управления · 23 поста</p>
         </div>
-        <span class="sheet-badge">Лист 1 / 5</span>
+        <span class="sheet-badge">Лист 1 / 6</span>
       </div>
       <div class="plan-wrap">
-        <img src="assets/electrician_plan_final.png" alt="Итоговый чертёж для электрика">
+        <img src="assets/electrician_plan_final.png" alt="Итоговый чертёж освещения для электрика">
       </div>
+    </section>
+
+    <section id="sec-sockets" class="sheet">
+      <div class="sheet-head">
+        <div>
+          <h2>ПЛАН РОЗЕТОК, СИЛОВЫХ ВЫВОДОВ И ЭЛЕКТРОЩИТА ЩР (НАД BM, h=1700)</h2>
+          <p>Все бытовые подрозетники сверлить строго по карандашной разметке заказчика на стенах · Все розетки, техника, роутер, ТП и кондиционер подключены ДО контактора BM</p>
+        </div>
+        <span class="sheet-badge">Лист 2 / 6</span>
+      </div>
+      <div class="plan-wrap" style="margin-bottom: 14px;">
+        <img src="assets/electrician_sockets_plan.png" alt="План розеток, электрощита и силовых линий для электрика">
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Линия</th>
+            <th>Автомат / УЗО в ЩР</th>
+            <th>Кабель</th>
+            <th>Потребители и правило подключения к мастер-выключателю BM</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="is-master"><td><strong>ЩР-00</strong></td><td>Ввод + РН-263t + УЗО тип A</td><td>Вводной</td><td>Общая защита квартиры (реле напряжения 190–253 В) + УЗО 30 мА на розеточные группы</td></tr>
+          <tr><td><strong>Гр. 01</strong></td><td>B10 (×3) + Контактор BM</td><td>3×1,5 / 5×1,5</td><td><strong>Все 34 световые группы №1–39</strong> — единственные линии ПОСЛЕ контактора мастер-выключателя BM</td></tr>
+          <tr><td><strong>Гр. 02</strong></td><td>C32 + дифавтомат</td><td>ВВГ 3×6,0</td><td>Варочная панель (плита у входа в кухню, h=300) — ДО контактора BM</td></tr>
+          <tr><td><strong>Гр. 03</strong></td><td>C16 (УЗО А 30 мА)</td><td>ВВГ 3×2,5</td><td>Духовой шкаф (h=300) — ДО контактора BM</td></tr>
+          <tr><td><strong>Гр. 04</strong></td><td>C16 (УЗО А 30 мА)</td><td>ВВГ 3×2,5</td><td>Стиральная машина на кухне (отдельная линия, розетка сбоку от техники, h=400) — ДО BM</td></tr>
+          <tr><td><strong>Гр. 05</strong></td><td>C16 (УЗО А 30 мА)</td><td>ВВГ 3×2,5</td><td>Сушильная машина на кухне (отдельная линия, рядом со стиралкой, h=400) — ДО BM</td></tr>
+          <tr><td><strong>Гр. 06</strong></td><td>C16 (УЗО А 30 мА)</td><td>ВВГ 3×2,5</td><td>Посудомоечная машина + фильтр/измельчитель под мойкой (розетка сбоку от ПММ, h=450) — ДО BM</td></tr>
+          <tr><td><strong>Гр. 07</strong></td><td>C16 (УЗО А 30 мА)</td><td>ВВГ 3×2,5</td><td>Рабочие розетки фартука кухни (h=1050: чайник, кофемашина, СВЧ; сверлить по разметке) — ДО BM</td></tr>
+          <tr class="is-master"><td><strong>Гр. 08</strong></td><td>C16 (неотключаемая)</td><td>ВВГ 3×2,5</td><td><strong>НЕОТКЛЮЧАЕМЫЕ:</strong> холодильник h=300 + скрытая вытяжка h=2150 + Wi‑Fi роутер h=2100 над ЩР (строго ДО BM; от роутера 2×Cat 6 в зал)</td></tr>
+          <tr><td><strong>Гр. 09</strong></td><td>C16 (УЗО А 30 мА)</td><td>ВВГ 3×2,5</td><td>Кондиционер над дверным проёмом спальни (дует в сторону зала, h=2450) — ДО BM</td></tr>
+          <tr><td><strong>Гр. 10</strong></td><td>C16 (УЗО А 30 мА)</td><td>ВВГ 3×2,5</td><td>Тёплые полы (подвод питания к терморегуляторам по уже выведенным датчикам пола, h=900) — ДО BM</td></tr>
+          <tr class="is-vent"><td><strong>Гр. 11</strong></td><td>C16 + B10 (УЗО 10 мА)</td><td>3×2,5 + 4×1,5</td><td>Санузел: розетка IP44+ у раковины h=950, полотенцесушитель h=800, защита от протечек h=300 + вент. №40 (B20) — ДО BM</td></tr>
+          <tr><td><strong>Гр. 12–13</strong></td><td>C16 + C16 (УЗО А 30 мА)</td><td>2×(ВВГ 3×2,5)</td><td>Розетки Зал + ТВ (2×Cat 6), Спальня (тумбы h=600 по оси 855 мм), Кладовая/Прихожая/Балкон (дежурные под робот-пылесос и автокормушки h=300) — ДО BM</td></tr>
+        </tbody>
+      </table>
     </section>
 
     <section id="sec-switches" class="sheet">
@@ -306,7 +346,7 @@
           <h2>ВЕДОМОСТЬ ВЫКЛЮЧАТЕЛЕЙ, РЕГУЛЯТОРОВ И МНОГОПОСТОВЫХ РАМОК (23 ПОСТА)</h2>
           <p>Раскладка по помещениям, блокам, клавишам и проверке открывания дверей</p>
         </div>
-        <span class="sheet-badge">Лист 2 / 5</span>
+        <span class="sheet-badge">Лист 3 / 6</span>
       </div>
       <table>
         <thead>
@@ -331,7 +371,7 @@
           <h2>ВЕДОМОСТЬ ТОЧЕК ОСВЕЩЕНИЯ И ВЕНТИЛЯЦИИ (№1–22, 24–40 — 39 ПОЗИЦИЙ)</h2>
           <p>Светильник №23 исключён; №39 — встроенная подсветка зеркала; №40 — вытяжной вентилятор санузла (мимо BM)</p>
         </div>
-        <span class="sheet-badge">Лист 3 / 5</span>
+        <span class="sheet-badge">Лист 4 / 6</span>
       </div>
       <table>
         <thead>
@@ -356,7 +396,7 @@
           <h2>ВЕДОМОСТЬ ГРУПП УПРАВЛЕНИЯ (35 КАНАЛОВ) И ТРЁХКОНТУРНЫХ ТРЕКОВ 230 В</h2>
           <p>34 канала освещения под контактором BM + 1 канал вентиляции санузла SU-VENT мимо контактора</p>
         </div>
-        <span class="sheet-badge">Лист 4 / 5</span>
+        <span class="sheet-badge">Лист 5 / 6</span>
       </div>
       <table>
         <thead>
@@ -380,7 +420,7 @@
           <h2>ТРЕБОВАНИЯ К СБОРКЕ ЭЛЕКТРОЩИТА, ВЕНТИЛЯЦИИ И МОНТАЖНЫМ ОТСТУПАМ</h2>
           <p>Итоговая памятка перед черновыми работами и штроблением</p>
         </div>
-        <span class="sheet-badge">Лист 5 / 5</span>
+        <span class="sheet-badge">Лист 6 / 6</span>
       </div>
       <div class="cards-grid">
         <div class="card is-red">
