@@ -274,16 +274,16 @@
       </nav>
     </div>
     <div class="toolbar-actions">
-      <a class="btn btn-back" href="assets/electrician_smartphone.html?v=10" download="Интерактивная_схема_для_смартфона.html">📱 Скачать на смартфон</a>
-      <a class="btn btn-file" href="assets/electrician_album_final.pdf?v=10" target="_blank">📄 Альбом PDF</a>
-      <a class="btn btn-file" href="assets/electrician_plan_final.png?v=10" target="_blank">🖼️ Чертёж PNG</a>
-      <a class="btn btn-file" href="assets/electrician_sockets_final.png?v=10" target="_blank">🔌 План розеток PNG</a>
-      <a class="btn btn-file" href="assets/electrician_tables_final.xlsx?v=10" download>📊 Excel</a>
-      <a class="btn btn-file" href="assets/electrician_points_final.csv?v=10" download>📋 CSV точки</a>
-      <a class="btn btn-file" href="assets/electrician_sockets_final.csv?v=10" download>🔌 CSV щит</a>
-      <a class="btn btn-file" href="assets/electrician_spec_final.md?v=10" target="_blank">📝 ТЗ (MD)</a>
+      <a class="btn btn-back" href="assets/electrician_smartphone.html?v=11" download="Интерактивная_схема_для_смартфона.html">📱 Скачать на смартфон</a>
+      <a class="btn btn-file" href="assets/electrician_album_final.pdf?v=11" target="_blank">📄 Альбом PDF</a>
+      <a class="btn btn-file" href="assets/electrician_plan_final.png?v=11" target="_blank">🖼️ Чертёж PNG</a>
+      <a class="btn btn-file" href="assets/electrician_sockets_final.png?v=11" target="_blank">🔌 План розеток PNG</a>
+      <a class="btn btn-file" href="assets/electrician_tables_final.xlsx?v=11" download>📊 Excel</a>
+      <a class="btn btn-file" href="assets/electrician_points_final.csv?v=11" download>📋 CSV точки</a>
+      <a class="btn btn-file" href="assets/electrician_sockets_final.csv?v=11" download>🔌 CSV щит</a>
+      <a class="btn btn-file" href="assets/electrician_spec_final.md?v=11" target="_blank">📝 ТЗ (MD)</a>
       <button type="button" class="btn btn-print" onclick="window.print()">🖨️ Печать / PDF</button>
-      <a class="btn btn-back" href="index.html?v=10">← Симулятор</a>
+      <a class="btn btn-back" href="index.html?v=11">← Симулятор</a>
     </div>
   </header>
 
@@ -299,7 +299,7 @@
         <span class="sheet-badge">Лист 1 / 6</span>
       </div>
       <div class="plan-wrap">
-        <img src="assets/electrician_plan_final.png?v=10" alt="Итоговый чертёж освещения для электрика">
+        <img src="assets/electrician_plan_final.png?v=11" alt="Итоговый чертёж освещения для электрика">
       </div>
     </section>
 
@@ -307,12 +307,15 @@
       <div class="sheet-head">
         <div>
           <h2>ПЛАН РОЗЕТОК, СИЛОВЫХ ВЫВОДОВ, СЛАБОТОЧКИ И ЭЛЕКТРОЩИТА ЩР</h2>
-          <p>Кухня: вся основная техника справа, холодильник слева · Бытовые розетки h=300 и ТП h=900 — по карандашной разметке на стенах · Все розетки ДО контактора М</p>
+          <p>Правая половина зала (25 розеток + RJ-45, пик 2 570 Вт на Гр. 12 C16) · Кухня справа, холодильник слева · ТП только ванная+балкон · Все розетки ДО М</p>
         </div>
         <span class="sheet-badge">Лист 2 / 6</span>
       </div>
       <div class="plan-wrap" style="margin-bottom: 14px;">
-        <img src="assets/electrician_sockets_final.png?v=10" alt="Итоговый план розеток, силовых выводов и щита ЩР">
+        <img src="assets/electrician_sockets_final.png?v=11" alt="Итоговый план розеток, силовых выводов и щита ЩР">
+      </div>
+      <div class="sync-banner" style="margin-bottom: 14px;">
+        <span>⚡ <strong>Нагрузка правой половины зала (расчёт для электрика по 26 позициям):</strong> 23 прибора в <strong>25 розеток <code>Гр. 12</code> (<code>C16</code>, <code>3×2,5 мм²</code>)</strong> = <strong>2 570 Вт</strong> (11,2 А, запас линии +1 110 Вт) + роутер <code>Гр. 08</code> = <strong>30 Вт</strong> + кабельный вывод кондиционера <code>Гр. 09</code> = <strong>1 400–1 500 Вт</strong> → суммарно по узлу <strong>~4 000 Вт (4,0 кВт)</strong>; розетка балкона (<code>1×IP44+</code>) на <code>Гр. 13</code>.</span>
       </div>
       <table>
         <thead>
@@ -332,12 +335,13 @@
           <tr><td><b>Гр. 05</b></td><td>C16 (УЗО А 30 мА)</td><td>ВВГ 3×2,5</td><td>Сушильная машина справа на кухне (отд. линия рядом со стиралкой, h=400) — ДО М</td></tr>
           <tr><td><b>Гр. 06</b></td><td>C16 (УЗО А 30 мА)</td><td>ВВГ 3×2,5</td><td>ПММ + фильтр/измельчитель под мойкой справа (сбоку от ПММ, h=450) — ДО М</td></tr>
           <tr><td><b>Гр. 07</b></td><td>C16 (УЗО А 30 мА)</td><td>ВВГ 3×2,5</td><td>Рабочие розетки фартука кухни справа (2×3=6 шт., h=1050: чайник, СВЧ, кофе) — ДО М</td></tr>
-          <tr class="row-vent"><td><b>Гр. 08</b></td><td>C16 (неоткл.)</td><td>2×(ВВГ 3×2,5)</td><td><b>НЕОТКЛЮЧАЕМЫЕ ДО М:</b> холодильник слева (h=300) + вытяжка (h=2150) + роутер (h=2150)</td></tr>
-          <tr><td><b>Гр. 09</b></td><td>C16 (УЗО А 30 мА)</td><td>ВВГ 3×2,5</td><td>Кондиционер над дверью спальни в сторону зала (h=2450) — отд. линия ДО М</td></tr>
+          <tr class="row-vent"><td><b>Гр. 08</b></td><td>C16 (неоткл.)</td><td>2×(ВВГ 3×2,5)</td><td><b>НЕОТКЛЮЧАЕМЫЕ ДО М:</b> холодильник слева (h=300) + вытяжка (h=2150) + Wi-Fi роутер 30 Вт (2×h=2150)</td></tr>
+          <tr><td><b>Гр. 09</b></td><td>C16 (УЗО А 30 мА)</td><td>ВВГ 3×2,5</td><td>Вывод кондиционера БЕЗ розетки над дверью спальни в зал (h=2450, ~1 400–1 500 Вт) — отд. линия ДО М</td></tr>
           <tr><td><b>Гр. 10</b></td><td>C16 (УЗО А 30 мА)</td><td>ВВГ 3×2,5</td><td>Тёплые полы: подвод к 2 терморегуляторам (h=900) — ТОЛЬКО ванная (с/у) и балкон — ДО М</td></tr>
           <tr><td><b>Гр. 11</b></td><td>C16 + B10 (УЗО 10 мА)</td><td>3×2,5 + 4×1,5</td><td>Санузел IP44+: раковина (h=950), полотенцесуш. (h=800), протечки/бойлер + вент. 21 — ДО М</td></tr>
-          <tr><td><b>Гр. 12</b></td><td>C16 (УЗО А 30 мА)</td><td>ВВГ 3×2,5</td><td>Розетки Зала + ТВ-зона (4+2 шт. + RJ-45) + стол/ПК (3 шт. + RJ-45) + балкон IP44+ — по каранд.</td></tr>
-          <tr><td><b>Гр. 13</b></td><td>C16 (УЗО А 30 мА)</td><td>ВВГ 3×2,5</td><td>Розетки Спальни (над тумбами 1 и 2 h=600, левая стена) + Прихожая + Кладовая (робот) + кормушка — ДО М</td></tr>
+          <tr class="row-vent"><td><b>Гр. 12</b></td><td>C16 (УЗО А 30 мА)</td><td>ВВГ 3×2,5</td><td><b>Правая половина зала (25 розеток + RJ-45, пик 2 570 Вт / 11,2 А):</b> ТВ, PS5, 4 колонки, 3 видеосвета, проектор, 2 MacBook, 5 тел., шторы h=2600, гирл., ЗУ — ДО М</td></tr>
+          <tr><td><b>Гр. 13</b></td><td>C16 (УЗО А 30 мА)</td><td>ВВГ 3×2,5</td><td>Левая половина зала (5 розеток + RJ-45) + Балкон (1×IP44+ h=300) + бытовой запас (пылесос/отпариватель) — ДО М</td></tr>
+          <tr><td><b>Гр. 14</b></td><td>C16 (УЗО А 30 мА)</td><td>ВВГ 3×2,5</td><td>Спальня (над тумбами 1 и 2 h=600, левая стена) + Прихожая (2×h=300) + Кладовая (робот) + кормушка — ДО М</td></tr>
         </tbody>
       </table>
     </section>
@@ -471,7 +475,7 @@
     </section>
   </main>
 
-  <script src="data.js?v=10"></script>
+  <script src="data.js?v=11"></script>
   <script>
     (function () {
       const D = window.LIGHTING_DATA;
