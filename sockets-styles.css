@@ -633,3 +633,73 @@
   opacity: 0;
   display: none;
 }
+
+.zone-filter-bar {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 3px;
+  background: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  border-radius: 9px;
+}
+
+.zone-btn {
+  appearance: none;
+  border: 1px solid transparent;
+  background: transparent;
+  color: #475569;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.14s ease;
+}
+
+.zone-btn:hover {
+  background: #e2e8f0;
+  color: #0f172a;
+}
+
+.zone-btn.is-active {
+  background: #0f172a;
+  color: #ffffff;
+  box-shadow: 0 1px 4px rgba(15, 23, 42, 0.24);
+}
+
+#stat-sockets-wrap.is-exact strong {
+  color: #15803d;
+}
+
+#stat-sockets-wrap.is-mismatch {
+  background: #fffbeb;
+  border: 1px solid #fcd34d;
+  border-radius: 5px;
+  padding: 1px 6px;
+}
+
+#stat-sockets-wrap.is-mismatch strong {
+  color: #b45309;
+}
+
+.socket-marker.is-other-zone {
+  pointer-events: none !important;
+  cursor: default;
+  opacity: 0.36;
+  z-index: 4;
+  filter: grayscale(1);
+}
+
+.socket-marker.is-other-zone .sock-frame {
+  border-color: #94a3b8 !important;
+  background: #f1f5f9 !important;
+  box-shadow: none !important;
+}
+
+.socket-marker.is-other-zone .sock-tag-pill {
+  color: #64748b;
+  border-color: #cbd5e1;
+  background: rgba(248, 250, 252, 0.85);
+}

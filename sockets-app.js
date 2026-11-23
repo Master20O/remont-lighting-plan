@@ -8,7 +8,7 @@
   }
 
   const SVG_NS = "http://www.w3.org/2000/svg";
-  const STORAGE_KEY = "sockets_editor_v1_state";
+  const STORAGE_KEY = "sockets_editor_v15_stage1_24";
 
   function deepClone(obj) {
     return JSON.parse(JSON.stringify(obj));
@@ -21,7 +21,8 @@
   const state = {
     groups: deepClone(BASELINE_GROUPS),
     blocks: deepClone(BASELINE_BLOCKS),
-    activeGroups: { G12: true },
+    activeGroups: { G12: true, G08: true, G09: true },
+    zoneMode: "stage1_hide", // "stage1_hide" | "stage1_gray" | "all"
     selectedBlockId: null,
     hoveredBlockId: null,
     activeTab: "blocks",
@@ -39,6 +40,7 @@
   const socketsLayerEl = document.getElementById("layer-sockets");
   const inspectorEl = document.getElementById("selected-inspector");
   const tabContentEl = document.getElementById("tab-content");
+  const statSocketsWrapEl = document.getElementById("stat-sockets-wrap");
   const statSocketsEl = document.getElementById("stat-sockets");
   const statRj45El = document.getElementById("stat-rj45");
   const statWattsEl = document.getElementById("stat-watts");
@@ -58,6 +60,26 @@
   const undoStack = [];
   const redoStack = [];
   let toastTimer = null;
+
+  function isStage1Block(b) {
+    return !!b && b.stage !== 2;
+  }
+
+  function isStage1Mode() {
+    return state.zoneMode !== "all";
+  }
+
+  function getActiveWalls() {
+    return isStage1Mode()
+      ? DATA.wallSegments.filter((w) => w.stage === 1)
+      : DATA.wallSegments;
+  }
+
+  function syncZoneButtonsUI() {
+    document.querySelectorAll(".zone-btn[data-zone-mode]").forEach((btn) => {
+      btn.classList.toggle("is-active", btn.getAttribute("data-zone-mode") === state.zoneMode);
+    });
+  }
 
   /* ==================== PERSISTENCE & UNDO/REDO ==================== */
 
@@ -100,7 +122,7 @@
       if (!parsed || !Array.isArray(parsed.groups) || !Array.isArray(parsed.blocks)) return;
       state.groups = parsed.groups;
       state.blocks = parsed.blocks;
-      state.activeGroups = parsed.activeGroups || { G12: true };
+      state.activeGroups = parsed.activeGroups || { G12: true, G08: true, G09: true };
       const selId = parsed.selectedBlockId || null;
       state.selectedBlockId = selId && state.blocks.some((b) => b.id === selId) ? selId : null;
       saveToStorage();
@@ -159,6 +181,7 @@
           groups: state.groups,
           blocks: state.blocks,
           activeGroups: state.activeGroups,
+          zoneMode: state.zoneMode,
           showDims: state.showDims
         })
       );
@@ -173,7 +196,10 @@
       if (parsed && Array.isArray(parsed.groups) && Array.isArray(parsed.blocks)) {
         state.groups = parsed.groups;
         state.blocks = parsed.blocks;
-        state.activeGroups = parsed.activeGroups || { G12: true };
+        state.activeGroups = parsed.activeGroups || { G12: true, G08: true, G09: true };
+        if (parsed.zoneMode === "stage1_hide" || parsed.zoneMode === "stage1_gray" || parsed.zoneMode === "all") {
+          state.zoneMode = parsed.zoneMode;
+        }
         state.showDims = parsed.showDims !== false;
       }
     } catch (e) {}
@@ -243,8 +269,8 @@
 
   function findNearestWall(px, py, maxDist) {
     let best = null;
-    let bestDist = typeof maxDist === "number" ? maxDist : 58;
-    DATA.wallSegments.forEach((wall) => {
+    let bestDist = typeof maxDist === "number" ? maxDist : (isStage1Mode() ? 75 : 58);
+    getActiveWalls().forEach((wall) => {
       const pr = projectOntoSegment(px, py, wall.x1, wall.y1, wall.x2, wall.y2);
       if (pr.dist < bestDist) {
         bestDist = pr.dist;
@@ -291,7 +317,9 @@
 
   function getGroupTotals(gid) {
     const grp = getGroupById(gid);
-    const members = state.blocks.filter((b) => b.groupId === gid && b.kind !== "shield");
+    const members = state.blocks.filter(
+      (b) => b.groupId === gid && b.kind !== "shield" && (!isStage1Mode() || isStage1Block(b))
+    );
     const watts = members.reduce((s, b) => s + (Number(b.watts) || 0), 0);
     const socketsCount = members.reduce((s, b) => s + (Number(b.sockets) || 0), 0);
     const rj45Count = members.reduce((s, b) => s + (Number(b.rj45) || 0), 0);
@@ -371,15 +399,36 @@
 
   function buildExportMarkdown() {
     const diffs = computeEditsSummary();
-    const lines = ["### Правки и ведомость розеток / RJ-45"];
+    const lines = [
+      isStage1Mode()
+        ? "### Правки и ведомость розеток — Этап 1 (Правая половина зала + Прихожая)"
+        : "### Правки и ведомость розеток / RJ-45"
+    ];
     if (diffs.length) {
       lines.push("", "**Изменения относительно базового плана:**");
       diffs.forEach((d) => lines.push(`- ${d}`));
     } else {
-      lines.push("", "_Изменений относительно базовой схемы розеток v=12 пока нет._");
+      lines.push("", "_Изменений относительно базовой схемы розеток v=15 пока нет._");
+    }
+    if (isStage1Mode()) {
+      const s1Blocks = state.blocks.filter((b) => isStage1Block(b) && b.kind !== "shield");
+      const s1SockTotal = s1Blocks.reduce((s, b) => s + (Number(b.sockets) || 0), 0);
+      const s1RjTotal = s1Blocks.reduce((s, b) => s + (Number(b.rj45) || 0), 0);
+      const s1WattsTotal = s1Blocks.reduce((s, b) => s + (Number(b.watts) || 0), 0);
+      lines.push("", `**Точки Этапа 1 (Итого: ${s1SockTotal} роз. 230В, ${s1RjTotal} RJ-45, ${s1WattsTotal} Вт с конд.):**`);
+      s1Blocks.forEach((b) => {
+        const wall = b.wallId ? wallById.get(b.wallId) : null;
+        const sideTxt = b.refSide === "right" ? "от правой стены" : "от левой стены";
+        const posTxt = wall ? `${wall.label}, ${b.offsetMm} мм ${sideTxt}` : `свободно (${b.x}, ${b.y})`;
+        const grp = getGroupById(b.groupId);
+        lines.push(`- **${b.id}** (${b.title}): ${formatBlockTypeSummary(b)}, ${grp ? grp.code : b.groupId}, h=${b.heightMm} мм, ${posTxt}, ${b.watts} Вт`);
+      });
     }
     lines.push("", "**Сводка по группам щита ЩР:**");
-    state.groups.forEach((g) => {
+    const groupsList = isStage1Mode()
+      ? state.groups.filter((g) => g.stage !== 2 || state.blocks.some((b) => isStage1Block(b) && b.groupId === g.id))
+      : state.groups;
+    groupsList.forEach((g) => {
       const t = getGroupTotals(g.id);
       lines.push(`- **${g.code}** (${g.name}, ${g.breaker}): ${t.socketsCount} роз. 230В, ${t.rj45Count} RJ-45, **${t.watts} Вт** (${t.amps.toFixed(1)} А)`);
     });
@@ -400,7 +449,7 @@
     });
 
     // Subtle highlighted clickable wall guides when dragging or selecting
-    DATA.wallSegments.forEach((w) => {
+    getActiveWalls().forEach((w) => {
       wallGuidesEl.appendChild(
         createSvgEl("line", {
           x1: w.x1, y1: w.y1, x2: w.x2, y2: w.y2,
@@ -413,6 +462,7 @@
     dimsLayerEl.innerHTML = "";
     const focusId = state.hoveredBlockId || state.selectedBlockId;
     state.blocks.forEach((b) => {
+      if (isStage1Mode() && !isStage1Block(b)) return;
       const isFocused = b.id === focusId;
       if (!isFocused && !state.showDims) return;
       if (!b.wallId) return;
@@ -450,14 +500,19 @@
   function renderSocketMarkers() {
     socketsLayerEl.innerHTML = "";
     state.blocks.forEach((b) => {
+      const inStage1 = isStage1Block(b);
+      if (state.zoneMode === "stage1_hide" && !inStage1) return;
+      const isOtherLocked = state.zoneMode === "stage1_gray" && !inStage1;
+
       const grp = getGroupById(b.groupId);
-      const isSelected = state.selectedBlockId === b.id;
-      const isGrpOn = !!state.activeGroups[b.groupId];
+      const isSelected = !isOtherLocked && state.selectedBlockId === b.id;
+      const isGrpOn = !isOtherLocked && !!state.activeGroups[b.groupId];
       const wall = b.wallId ? wallById.get(b.wallId) : null;
       const isVertWall = wall && Math.abs(wall.y2 - wall.y1) > Math.abs(wall.x2 - wall.x1);
 
       const el = document.createElement("div");
       el.className = "socket-marker";
+      if (isOtherLocked) el.classList.add("is-other-zone");
       if (isSelected) el.classList.add("is-selected");
       if (isGrpOn) el.classList.add("is-group-on");
       el.style.left = `${b.x}px`;
@@ -474,7 +529,7 @@
       if (b.kind === "thermo") frame.classList.add("is-thermo");
       if (b.kind === "shield") frame.classList.add("is-shield");
 
-      if (grp && !b.ip44 && b.kind === "socket" && b.sockets > 0 && !isGrpOn) {
+      if (!isOtherLocked && grp && !b.ip44 && b.kind === "socket" && b.sockets > 0 && !isGrpOn) {
         frame.style.borderColor = grp.color;
       }
 
@@ -514,21 +569,43 @@
         el.appendChild(tag);
       }
 
-      bindBlockMarkerEvents(el, b);
+      if (!isOtherLocked) {
+        bindBlockMarkerEvents(el, b);
+      }
       socketsLayerEl.appendChild(el);
     });
   }
 
   function renderStatsAndBadges() {
-    const totalSockets = state.blocks.reduce((s, b) => s + (Number(b.sockets) || 0), 0);
-    const totalRj45 = state.blocks.reduce((s, b) => s + (Number(b.rj45) || 0), 0);
-    const activeWatts = state.blocks
+    const s1Mode = isStage1Mode();
+    const countedBlocks = s1Mode ? state.blocks.filter(isStage1Block) : state.blocks;
+    const totalSockets = countedBlocks.reduce((s, b) => s + (Number(b.sockets) || 0), 0);
+    const totalRj45 = countedBlocks.reduce((s, b) => s + (Number(b.rj45) || 0), 0);
+    const activeWatts = countedBlocks
       .filter((b) => state.activeGroups[b.groupId])
       .reduce((s, b) => s + (Number(b.watts) || 0), 0);
-    statSocketsEl.textContent = String(totalSockets);
+
+    if (s1Mode) {
+      const target = DATA.stage1TargetSockets || 24;
+      const diff = totalSockets - target;
+      if (diff === 0) {
+        statSocketsWrapEl.classList.add("is-exact");
+        statSocketsWrapEl.classList.remove("is-mismatch");
+        statSocketsWrapEl.innerHTML = `Розеток (этап 1): <strong id="stat-sockets">${totalSockets} / ${target} ✓</strong>`;
+      } else {
+        statSocketsWrapEl.classList.remove("is-exact");
+        statSocketsWrapEl.classList.add("is-mismatch");
+        const signDiff = diff > 0 ? `+${diff}` : String(diff);
+        statSocketsWrapEl.innerHTML = `Розеток (этап 1): <strong id="stat-sockets">${totalSockets} из ${target} (${signDiff}) ⚠️</strong>`;
+      }
+    } else {
+      statSocketsWrapEl.classList.remove("is-exact", "is-mismatch");
+      statSocketsWrapEl.innerHTML = `Розеток всего: <strong id="stat-sockets">${totalSockets}</strong>`;
+    }
+
     statRj45El.textContent = String(totalRj45);
     statWattsEl.textContent = `${activeWatts.toLocaleString("ru-RU")} Вт`;
-    tabBlocksCountEl.textContent = String(state.blocks.length);
+    tabBlocksCountEl.textContent = String(countedBlocks.length);
 
     const diffCount = computeEditsSummary().length;
     editsBtnCountEl.textContent = String(diffCount);
@@ -554,9 +631,11 @@
     const groupOpts = state.groups
       .map((g) => `<option value="${escapeHtml(g.id)}" ${g.id === b.groupId ? "selected" : ""}>${escapeHtml(g.code)} — ${escapeHtml(g.name)}</option>`)
       .join("");
+    const activeWalls = getActiveWalls();
+    const wallList = wall && !activeWalls.some((w) => w.id === wall.id) ? [wall, ...activeWalls] : activeWalls;
     const wallOpts = [
       `<option value="" ${!b.wallId ? "selected" : ""}>Без привязки к стене (свободно)</option>`,
-      ...DATA.wallSegments.map((w) => `<option value="${escapeHtml(w.id)}" ${w.id === b.wallId ? "selected" : ""}>${escapeHtml(w.label)}</option>`)
+      ...wallList.map((w) => `<option value="${escapeHtml(w.id)}" ${w.id === b.wallId ? "selected" : ""}>${escapeHtml(w.label)}</option>`)
     ].join("");
 
     const heightPresets = [300, 400, 600, 900, 950, 1050, 1300, 2150, 2450, 2600];
@@ -582,6 +661,11 @@
             )
             .join("")}
         </div>
+        ${
+          b.kind === "socket" && b.sockets >= 2
+            ? `<button type="button" class="step-btn" id="ins-split-btn" style="width:100%;margin-top:6px;background:#eff6ff;border-color:#93c5fd;color:#1e3a8a;">✂️ Отделить 1 розетку в отдельный блок (сумма не изменится)</button>`
+            : ""
+        }
         <span class="ed-label" style="margin-top:7px;">Интернет-розетка RJ-45 (Cat 6) и влагозащита</span>
         <div class="seg-row">
           ${[0, 1, 2]
@@ -689,6 +773,47 @@
     document.getElementById("ins-dup-btn").addEventListener("click", () => {
       duplicateBlock(b);
     });
+    const splitBtn = document.getElementById("ins-split-btn");
+    if (splitBtn) {
+      splitBtn.addEventListener("click", () => {
+        if (b.sockets < 2) return;
+        pushUndoSnapshot();
+        const prevCount = b.sockets;
+        const totalWatts = Number(b.watts) || 0;
+        const splitWatts = Math.round(totalWatts / prevCount / 10) * 10;
+        b.sockets = prevCount - 1;
+        b.watts = Math.max(0, totalWatts - splitWatts);
+
+        const nb = {
+          id: getNextBlockId(),
+          stage: b.stage || 1,
+          room: b.room,
+          title: `${b.title} (отдел. 1×)`,
+          kind: "socket",
+          sockets: 1,
+          rj45: 0,
+          ip44: !!b.ip44,
+          watts: splitWatts,
+          groupId: b.groupId,
+          wallId: b.wallId,
+          refSide: b.refSide || "left",
+          offsetMm: b.offsetMm || 300,
+          heightMm: b.heightMm || 300,
+          byPencil: !!b.byPencil,
+          x: b.x + 48,
+          y: b.y,
+          comment: "Отделено из блока " + b.id
+        };
+        if (wall) {
+          const nextOff = nb.offsetMm + 220 <= wall.lengthMm ? nb.offsetMm + 220 : Math.max(0, nb.offsetMm - 220);
+          moveBlockToWallOffset(nb, wall, nb.refSide, nextOff);
+        }
+        state.blocks.push(nb);
+        state.selectedBlockId = nb.id;
+        saveToStorage();
+        renderAll();
+      });
+    }
     inspectorEl.querySelectorAll("[data-set-sockets]").forEach((btn) => {
       btn.addEventListener("click", () => {
         pushUndoSnapshot();
@@ -878,9 +1003,11 @@
   }
 
   function renderSidebarTab() {
+    const s1Mode = isStage1Mode();
     if (state.activeTab === "blocks") {
       const grouped = new Map();
-      state.blocks.forEach((b) => {
+      const visibleBlocks = s1Mode ? state.blocks.filter(isStage1Block) : state.blocks;
+      visibleBlocks.forEach((b) => {
         const rm = b.room || "Прочее";
         if (!grouped.has(rm)) grouped.set(rm, []);
         grouped.get(rm).push(b);
@@ -913,7 +1040,10 @@
           return `<div class="room-group"><div class="room-group-hdr"><span>${escapeHtml(rm)}</span><span>${rmSocks} роз. · ${rmWatts} Вт</span></div>${itemsHtml}</div>`;
         })
         .join("");
-      tabContentEl.innerHTML = html || "<div class='inspector-empty'>Нет точек розеток.</div>";
+      const stageNote = s1Mode
+        ? `<div class="inspector-empty" style="margin-bottom:8px;padding:7px 9px;background:#eff6ff;border:1px solid #bfdbfe;border-radius:7px;font-size:11px;">🎯 Показан <b>только Этап 1</b> (Правая половина зала + Прихожая). Остальные комнаты не перемешиваются.</div>`
+        : "";
+      tabContentEl.innerHTML = (html ? stageNote + html : "<div class='inspector-empty'>Нет точек розеток.</div>");
 
       tabContentEl.querySelectorAll("[data-select-block]").forEach((el) => {
         el.addEventListener("click", (e) => {
@@ -940,7 +1070,10 @@
         <span style="font-size:11.5px;color:#475569;font-weight:700;">Нажмите на группу, чтобы подсветить её розетки на плане:</span>
         <button type="button" class="btn-primary" id="btn-tab-add-grp" style="padding:4px 8px;font-size:11px;">+ Группа</button>
       </div>`;
-      const cardsHtml = state.groups
+      const visibleGroups = s1Mode
+        ? state.groups.filter((g) => g.stage !== 2 || state.blocks.some((b) => isStage1Block(b) && b.groupId === g.id))
+        : state.groups;
+      const cardsHtml = visibleGroups
         .map((g) => {
           const t = getGroupTotals(g.id);
           const isOn = !!state.activeGroups[g.id];
@@ -962,7 +1095,10 @@
             </div>`;
         })
         .join("");
-      tabContentEl.innerHTML = topBtn + cardsHtml;
+      const stage2GrpNote = s1Mode
+        ? `<div class="inspector-empty" style="margin-top:8px;padding:7px 9px;background:#f8fafc;border:1px dashed #cbd5e1;border-radius:7px;font-size:11px;">Линии остальных комнат (кухня, с/у, спальня, балкон) относятся ко <b>2-му этапу</b> и скрыты, чтобы не путаться. Переключите режим на «🔓 Все комнаты», чтобы увидеть их.</div>`
+        : "";
+      tabContentEl.innerHTML = topBtn + cardsHtml + stage2GrpNote;
       document.getElementById("btn-tab-add-grp").addEventListener("click", () => openAddGroupModal(null));
       tabContentEl.querySelectorAll("[data-toggle-grp]").forEach((card) => {
         card.addEventListener("click", () => {
@@ -979,7 +1115,7 @@
     const diffs = computeEditsSummary();
     tabContentEl.innerHTML = diffs.length
       ? diffs.map((d) => `<div class="block-item" style="font-size:11.5px;">• ${escapeHtml(d)}</div>`).join("")
-      : `<div class="inspector-empty">Изменений относительно базовой схемы v=12 пока нет. Любая перестановка, добавление 1–5 розеток, RJ-45, смена группы или высоты/отступа появится здесь.</div>`;
+      : `<div class="inspector-empty">Изменений относительно базовой схемы v=15 (24 розетки Этапа 1) пока нет. Любая перестановка, отделение розетки, смена группы или высоты/отступа появится здесь.</div>`;
   }
 
   function renderAll() {
@@ -1038,10 +1174,11 @@
   }
 
   function openAddSocketModal() {
-    const wallOpts = DATA.wallSegments
+    const wallOpts = getActiveWalls()
       .map((w) => `<option value="${escapeHtml(w.id)}" ${w.id === "liv_right" ? "selected" : ""}>${escapeHtml(w.label)}</option>`)
       .join("");
     const grpOpts = state.groups
+      .filter((g) => !isStage1Mode() || g.stage !== 2)
       .map((g) => `<option value="${escapeHtml(g.id)}" ${g.id === "G12" ? "selected" : ""}>${escapeHtml(g.code)} — ${escapeHtml(g.name)}</option>`)
       .join("");
 
@@ -1116,6 +1253,7 @@
 
       const newBlock = {
         id: getNextBlockId(),
+        stage: isStage1Mode() ? 1 : (wall.stage || 1),
         room: wall.room,
         title,
         kind: chosenSockets === 0 && chosenRj45 > 0 ? "rj45" : "socket",
@@ -1475,16 +1613,32 @@
     }
   });
 
+  document.querySelectorAll(".zone-btn[data-zone-mode]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const nextMode = btn.getAttribute("data-zone-mode");
+      if (!nextMode || nextMode === state.zoneMode) return;
+      state.zoneMode = nextMode;
+      if (isStage1Mode() && state.selectedBlockId) {
+        const curSel = getBlockById(state.selectedBlockId);
+        if (!curSel || !isStage1Block(curSel)) state.selectedBlockId = null;
+      }
+      syncZoneButtonsUI();
+      saveToStorage();
+      renderAll();
+    });
+  });
+
   document.getElementById("btn-reset-edits").addEventListener("click", () => {
     if (!confirm("Сбросить все ваши добавления, перестановки, группы и размеры к базовой схеме розеток?")) return;
     pushUndoSnapshot();
     try { localStorage.removeItem(STORAGE_KEY); } catch (e) {}
     state.groups = deepClone(BASELINE_GROUPS);
     state.blocks = deepClone(BASELINE_BLOCKS);
-    state.activeGroups = { G12: true };
+    state.activeGroups = { G12: true, G08: true, G09: true };
     state.selectedBlockId = null;
     state.showDims = true;
     btnToggleDimsEl.classList.add("is-active");
+    syncZoneButtonsUI();
     saveToStorage();
     renderAll();
   });
@@ -1507,6 +1661,7 @@
 
   // Boot
   loadFromStorage();
+  syncZoneButtonsUI();
   btnToggleDimsEl.classList.toggle("is-active", !!state.showDims);
   renderAll();
   updateUndoButtonsUI();

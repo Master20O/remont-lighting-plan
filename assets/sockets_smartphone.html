@@ -3536,6 +3536,76 @@ body.is-demo-mode .switch-popover {
   display: none;
 }
 
+.zone-filter-bar {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 3px;
+  background: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  border-radius: 9px;
+}
+
+.zone-btn {
+  appearance: none;
+  border: 1px solid transparent;
+  background: transparent;
+  color: #475569;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.14s ease;
+}
+
+.zone-btn:hover {
+  background: #e2e8f0;
+  color: #0f172a;
+}
+
+.zone-btn.is-active {
+  background: #0f172a;
+  color: #ffffff;
+  box-shadow: 0 1px 4px rgba(15, 23, 42, 0.24);
+}
+
+#stat-sockets-wrap.is-exact strong {
+  color: #15803d;
+}
+
+#stat-sockets-wrap.is-mismatch {
+  background: #fffbeb;
+  border: 1px solid #fcd34d;
+  border-radius: 5px;
+  padding: 1px 6px;
+}
+
+#stat-sockets-wrap.is-mismatch strong {
+  color: #b45309;
+}
+
+.socket-marker.is-other-zone {
+  pointer-events: none !important;
+  cursor: default;
+  opacity: 0.36;
+  z-index: 4;
+  filter: grayscale(1);
+}
+
+.socket-marker.is-other-zone .sock-frame {
+  border-color: #94a3b8 !important;
+  background: #f1f5f9 !important;
+  box-shadow: none !important;
+}
+
+.socket-marker.is-other-zone .sock-tag-pill {
+  color: #64748b;
+  border-color: #cbd5e1;
+  background: rgba(248, 250, 252, 0.85);
+}
+
 </style>
 </head>
 <body>
@@ -3546,17 +3616,29 @@ body.is-demo-mode .switch-popover {
           <h1>Конструктор розеток, RJ-45 и щита ЩР</h1>
         </div>
         <div class="brand-subrow">
-          <span>Добавление/удаление 1–5 постов + RJ-45 · перенос по стене · отступ от левой/правой стены (мм) · высота h (мм) · группы ЩР · ⌘Z отмена</span>
+          <span>Этап 1: правая половина зала + прихожая (строго 24 розетки под 24 устройства + RJ-45 + вывод конд.) · ⌘Z отмена</span>
         </div>
       </div>
 
       <div class="topbar-controls">
+        <div class="zone-filter-bar" role="group" aria-label="Режим отображения зон">
+          <button type="button" class="zone-btn is-active" data-zone-mode="stage1_hide" title="Показать ТОЛЬКО правую половину зала + прихожую (остальные комнаты скрыты)">
+            🎯 Зал прав. + Прихожая
+          </button>
+          <button type="button" class="zone-btn" data-zone-mode="stage1_gray" title="Показать остальные комнаты бледно-серым цветом (заблокированы от случайного сдвига)">
+            🔒 Остальные серым
+          </button>
+          <button type="button" class="zone-btn" data-zone-mode="all" title="Разблокировать все комнаты квартиры">
+            🔓 Все комнаты
+          </button>
+        </div>
+
         <div class="stats-pill" id="live-stats" aria-live="polite">
-          <span>Розеток: <strong id="stat-sockets">0</strong></span>
+          <span id="stat-sockets-wrap" class="is-exact">Розеток (этап 1): <strong id="stat-sockets">24 / 24 ✓</strong></span>
           <span class="sep">·</span>
-          <span>RJ-45: <strong id="stat-rj45">0</strong></span>
+          <span>RJ-45: <strong id="stat-rj45">1</strong></span>
           <span class="sep">·</span>
-          <span>Нагрузка вкл.: <strong id="stat-watts">0 Вт</strong></span>
+          <span>Нагрузка: <strong id="stat-watts">2 600 Вт</strong></span>
         </div>
 
         <div class="toolbar-actions">
@@ -3654,6 +3736,7 @@ window.SOCKETS_DATA = {
       maxY: 2300
     }
   },
+  stage1TargetSockets: 24,
   rooms: [
     "Прихожая",
     "Кладовая",
@@ -3665,231 +3748,228 @@ window.SOCKETS_DATA = {
     "Спальня"
   ],
   wallSegments: [
-    { id: "kitch_right", room: "Кухня", label: "Правая стена кухни (3 216 мм)", x1: 2083, y1: 398, x2: 2083, y2: 1030, lengthMm: 3216, normal: "left" },
-    { id: "kitch_left",  room: "Кухня", label: "Левая стена кухни (3 000 мм)", x1: 1613, y1: 398, x2: 1613, y2: 986,  lengthMm: 3000, normal: "right" },
-    { id: "kitch_top",   room: "Кухня", label: "Верхняя стена кухни (2 930 мм)", x1: 1613, y1: 398, x2: 2083, y2: 398,  lengthMm: 2930, normal: "down" },
+    // --- ЭТАП 1: ПРАВАЯ ПОЛОВИНА ЗАЛА + ПРИХОЖАЯ ---
+    { id: "liv_top_r",     stage: 1, room: "Зал (правая пол.)", label: "Верхняя стена зала правая (3 220 мм)", x1: 1026, y1: 455,  x2: 1570, y2: 455,  lengthMm: 3220, normal: "down" },
+    { id: "liv_right",     stage: 1, room: "Зал (правая пол.)", label: "Правая стена зала ТВ (3 000 мм)", x1: 1570, y1: 455,  x2: 1570, y2: 986,  lengthMm: 3000, normal: "left" },
+    { id: "liv_pier",      stage: 1, room: "Зал (правая пол.)", label: "Простенок зала (1 360 мм)", x1: 1026, y1: 455,  x2: 1026, y2: 700,  lengthMm: 1360, normal: "right" },
+    { id: "liv_kitch_pier",stage: 1, room: "Зал (правая пол.)", label: "Простенок у входа в кухню (570 мм)", x1: 1530, y1: 1030, x2: 1750, y2: 1030, lengthMm: 570, normal: "down" },
+    { id: "liv_bot",       stage: 1, room: "Зал (правая пол.)", label: "Нижняя стена зала вдоль кладовой (4 320 мм)", x1: 958,  y1: 1311, x2: 1750, y2: 1311, lengthMm: 4320, normal: "up" },
+    { id: "ac_door",       stage: 1, room: "Зал (правая пол.)", label: "Над дверным проёмом спальни (1 000 мм)", x1: 770,  y1: 1580, x2: 955,  y2: 1580, lengthMm: 1000, normal: "up" },
+    { id: "hall_right",    stage: 1, room: "Прихожая",          label: "Правая стена прихожей (2 400 мм)", x1: 1855, y1: 1068, x2: 1855, y2: 1511, lengthMm: 2400, normal: "left" },
+    { id: "hall_left",     stage: 1, room: "Прихожая",          label: "Левая стена прихожей у кладовой (1 100 мм)", x1: 1750, y1: 1311, x2: 1750, y2: 1511, lengthMm: 1100, normal: "right" },
+    { id: "hall_bot",      stage: 1, room: "Прихожая",          label: "Нижняя стена прихожей ЩР/М (920 мм)", x1: 1750, y1: 1511, x2: 1855, y2: 1511, lengthMm: 920,  normal: "up" },
 
-    { id: "liv_top_r",   room: "Зал (правая пол.)", label: "Верхняя стена зала правая (3 220 мм)", x1: 1026, y1: 455,  x2: 1570, y2: 455,  lengthMm: 3220, normal: "down" },
-    { id: "liv_right",   room: "Зал (правая пол.)", label: "Правая стена зала ТВ (3 000 мм)", x1: 1570, y1: 455,  x2: 1570, y2: 986,  lengthMm: 3000, normal: "left" },
-    { id: "liv_pier",    room: "Зал (правая пол.)", label: "Простенок зала (1 360 мм)", x1: 1026, y1: 455,  x2: 1026, y2: 700,  lengthMm: 1360, normal: "right" },
-    { id: "liv_bot",     room: "Зал (правая пол.)", label: "Нижняя стена зала у кладовой (3 340 мм)", x1: 958,  y1: 1311, x2: 1570, y2: 1311, lengthMm: 3340, normal: "up" },
-    { id: "ac_door",     room: "Зал (правая пол.)", label: "Над дверным проёмом спальни (1 000 мм)", x1: 770,  y1: 1580, x2: 955,  y2: 1580, lengthMm: 1000, normal: "up" },
+    // --- ЭТАП 2: ОСТАЛЬНЫЕ ПОМЕЩЕНИЯ ---
+    { id: "kitch_right", stage: 2, room: "Кухня", label: "Правая стена кухни (3 216 мм)", x1: 2083, y1: 398, x2: 2083, y2: 1030, lengthMm: 3216, normal: "left" },
+    { id: "kitch_left",  stage: 2, room: "Кухня", label: "Левая стена кухни (3 000 мм)", x1: 1613, y1: 398, x2: 1613, y2: 986,  lengthMm: 3000, normal: "right" },
+    { id: "kitch_top",   stage: 2, room: "Кухня", label: "Верхняя стена кухни (2 930 мм)", x1: 1613, y1: 398, x2: 2083, y2: 398,  lengthMm: 2930, normal: "down" },
 
-    { id: "liv_top_l",   room: "Зал (левая пол.)", label: "Верхняя стена зала левая (2 850 мм)", x1: 488,  y1: 455,  x2: 983,  y2: 455,  lengthMm: 2850, normal: "down" },
-    { id: "liv_left",    room: "Зал (левая пол.)", label: "Левая стена зала (3 740 мм)", x1: 488,  y1: 455,  x2: 488,  y2: 1076, lengthMm: 3740, normal: "right" },
+    { id: "liv_top_l",   stage: 2, room: "Зал (левая пол.)", label: "Верхняя стена зала левая (2 850 мм)", x1: 488,  y1: 455,  x2: 983,  y2: 455,  lengthMm: 2850, normal: "down" },
+    { id: "liv_left",    stage: 2, room: "Зал (левая пол.)", label: "Левая стена зала (3 740 мм)", x1: 488,  y1: 455,  x2: 488,  y2: 1076, lengthMm: 3740, normal: "right" },
 
-    { id: "hall_right",  room: "Прихожая", label: "Правая стена прихожей (2 400 мм)", x1: 1855, y1: 1068, x2: 1855, y2: 1511, lengthMm: 2400, normal: "left" },
-    { id: "hall_bot",    room: "Прихожая", label: "Нижняя стена прихожей ЩР/М (920 мм)", x1: 1750, y1: 1511, x2: 1855, y2: 1511, lengthMm: 920,  normal: "up" },
-    { id: "pantry_top",  room: "Кладовая", label: "Верхняя стена кладовой (4 150 мм)", x1: 1020, y1: 1355, x2: 1730, y2: 1355, lengthMm: 4150, normal: "down" },
+    { id: "pantry_top",  stage: 2, room: "Кладовая", label: "Верхняя стена кладовой (4 150 мм)", x1: 1020, y1: 1355, x2: 1730, y2: 1355, lengthMm: 4150, normal: "down" },
 
-    { id: "bath_top",    room: "Санузел", label: "Верхняя стена ванной (1 730 мм)", x1: 490,  y1: 1118, x2: 725,  y2: 1118, lengthMm: 1730, normal: "down" },
-    { id: "bath_right",  room: "Санузел", label: "Правая стена санузла (2 900 мм)", x1: 725,  y1: 1118, x2: 725,  y2: 1591, lengthMm: 2900, normal: "left" },
-    { id: "bath_entry",  room: "Санузел", label: "Простенок входа в санузел (1 200 мм)", x1: 769,  y1: 1330, x2: 769,  y2: 1550, lengthMm: 1200, normal: "right" },
+    { id: "bath_top",    stage: 2, room: "Санузел", label: "Верхняя стена ванной (1 730 мм)", x1: 490,  y1: 1118, x2: 725,  y2: 1118, lengthMm: 1730, normal: "down" },
+    { id: "bath_right",  stage: 2, room: "Санузел", label: "Правая стена санузла (2 900 мм)", x1: 725,  y1: 1118, x2: 725,  y2: 1591, lengthMm: 2900, normal: "left" },
+    { id: "bath_entry",  stage: 2, room: "Санузел", label: "Простенок входа в санузел (1 200 мм)", x1: 769,  y1: 1330, x2: 769,  y2: 1550, lengthMm: 1200, normal: "right" },
 
-    { id: "balc_bot",    room: "Балкон",  label: "Балкон — низ слева от двери (1 135 мм)", x1: 1570, y1: 352,  x2: 1753, y2: 352,  lengthMm: 1135, normal: "up" },
-    { id: "balc_top",    room: "Балкон",  label: "Балкон — верхняя стена (2 870 мм)", x1: 1570, y1: 180,  x2: 2029, y2: 180,  lengthMm: 2870, normal: "down" },
+    { id: "balc_bot",    stage: 2, room: "Балкон",  label: "Балкон — низ слева от двери (1 135 мм)", x1: 1570, y1: 352,  x2: 1753, y2: 352,  lengthMm: 1135, normal: "up" },
+    { id: "balc_top",    stage: 2, room: "Балкон",  label: "Балкон — верхняя стена (2 870 мм)", x1: 1570, y1: 180,  x2: 2029, y2: 180,  lengthMm: 2870, normal: "down" },
 
-    { id: "bed_right",   room: "Спальня", label: "Правая стена спальни изголовье (3 710 мм)", x1: 955,  y1: 1636, x2: 955,  y2: 2229, lengthMm: 3710, normal: "left" },
-    { id: "bed_left",    room: "Спальня", label: "Левая стена спальни с окном (3 710 мм)", x1: 463,  y1: 1636, x2: 463,  y2: 2229, lengthMm: 3710, normal: "right" },
-    { id: "bed_top",     room: "Спальня", label: "Верхняя стена спальни (2 850 мм)", x1: 463,  y1: 1636, x2: 955,  y2: 1636, lengthMm: 2850, normal: "down" },
-    { id: "bed_bot",     room: "Спальня", label: "Нижняя стена спальни (2 850 мм)", x1: 463,  y1: 2229, x2: 955,  y2: 2229, lengthMm: 2850, normal: "up" }
+    { id: "bed_right",   stage: 2, room: "Спальня", label: "Правая стена спальни изголовье (3 710 мм)", x1: 955,  y1: 1636, x2: 955,  y2: 2229, lengthMm: 3710, normal: "left" },
+    { id: "bed_left",    stage: 2, room: "Спальня", label: "Левая стена спальни с окном (3 710 мм)", x1: 463,  y1: 1636, x2: 463,  y2: 2229, lengthMm: 3710, normal: "right" },
+    { id: "bed_top",     stage: 2, room: "Спальня", label: "Верхняя стена спальни (2 850 мм)", x1: 463,  y1: 1636, x2: 955,  y2: 1636, lengthMm: 2850, normal: "down" },
+    { id: "bed_bot",     stage: 2, room: "Спальня", label: "Нижняя стена спальни (2 850 мм)", x1: 463,  y1: 2229, x2: 955,  y2: 2229, lengthMm: 2850, normal: "up" }
   ],
   shieldAnchor: { x: 1775, y: 1511 },
   wifiAnchor: { x: 1832, y: 1511 },
   groups: [
-    { id: "G02", code: "Гр. 02", name: "Варочная панель (плита)", breaker: "C32 + дифавтомат", maxWatts: 7360, cable: "ВВГ 3×6,0", color: "#dc2626", nonMaster: true },
-    { id: "G03", code: "Гр. 03", name: "Духовой шкаф (кухня справа)", breaker: "C16 (УЗО А 30 мА)", maxWatts: 3680, cable: "ВВГ 3×2,5", color: "#ea580c", nonMaster: true },
-    { id: "G04", code: "Гр. 04", name: "Стиральная машина (кухня справа)", breaker: "C16 (УЗО А 30 мА)", maxWatts: 3680, cable: "ВВГ 3×2,5", color: "#d97706", nonMaster: true },
-    { id: "G05", code: "Гр. 05", name: "Сушильная машина (кухня справа)", breaker: "C16 (УЗО А 30 мА)", maxWatts: 3680, cable: "ВВГ 3×2,5", color: "#ca8a04", nonMaster: true },
-    { id: "G06", code: "Гр. 06", name: "ПММ + мойка/фильтр/измельчитель", breaker: "C16 (УЗО А 30 мА)", maxWatts: 3680, cable: "ВВГ 3×2,5", color: "#65a30d", nonMaster: true },
-    { id: "G07", code: "Гр. 07", name: "Фартук кухни (чайник, СВЧ, кофе)", breaker: "C16 (УЗО А 30 мА)", maxWatts: 3680, cable: "ВВГ 3×2,5", color: "#059669", nonMaster: true },
-    { id: "G08", code: "Гр. 08", name: "НЕОТКЛЮЧАЕМЫЕ: Холодильник + Вытяжка + Wi-Fi", breaker: "C16 (неоткл.)", maxWatts: 3680, cable: "2×(ВВГ 3×2,5)", color: "#0284c7", nonMaster: true },
-    { id: "G09", code: "Гр. 09", name: "Кондиционер (вывод 3×2,5 без розетки)", breaker: "C16 (УЗО А 30 мА)", maxWatts: 3680, cable: "ВВГ 3×2,5", color: "#0ea5e9", nonMaster: true },
-    { id: "G10", code: "Гр. 10", name: "Тёплые полы (ванная + балкон)", breaker: "C16 (УЗО А 30 мА)", maxWatts: 3680, cable: "ВВГ 3×2,5", color: "#7c3aed", nonMaster: true },
-    { id: "G11", code: "Гр. 11", name: "Санузел IP44+ (раковина, ПС, протечки/бойлер)", breaker: "C16 (УЗО 10 мА)", maxWatts: 3680, cable: "ВВГ 3×2,5", color: "#0891b2", nonMaster: true },
-    { id: "G12", code: "Гр. 12", name: "Правая половина зала (25 роз. + RJ-45, 2 570 Вт)", breaker: "C16 (УЗО А 30 мА)", maxWatts: 3680, cable: "ВВГ 3×2,5", color: "#2563eb", nonMaster: true },
-    { id: "G13", code: "Гр. 13", name: "Левая половина зала + Балкон + бытовой резерв", breaker: "C16 (УЗО А 30 мА)", maxWatts: 3680, cable: "ВВГ 3×2,5", color: "#4f46e5", nonMaster: true },
-    { id: "G14", code: "Гр. 14", name: "Спальня (тумбы h=600) + Прихожая + Кладовая + кормушка", breaker: "C16 (УЗО А 30 мА)", maxWatts: 3680, cable: "ВВГ 3×2,5", color: "#db2777", nonMaster: true }
+    { id: "G12", stage: 1, code: "Гр. 12", name: "Правая половина зала (23 роз. + RJ-45, 2 570 Вт)", breaker: "C16 (УЗО А 30 мА)", maxWatts: 3680, cable: "ВВГ 3×2,5", color: "#2563eb", nonMaster: true },
+    { id: "G08", stage: 1, code: "Гр. 08", name: "НЕОТКЛЮЧАЕМЫЕ: Wi-Fi роутер (+ Холодильник/Вытяжка)", breaker: "C16 (неоткл.)", maxWatts: 3680, cable: "ВВГ 3×2,5", color: "#0284c7", nonMaster: true },
+    { id: "G09", stage: 1, code: "Гр. 09", name: "Кондиционер (вывод 3×2,5 без розетки)", breaker: "C16 (УЗО А 30 мА)", maxWatts: 3680, cable: "ВВГ 3×2,5", color: "#0ea5e9", nonMaster: true },
+
+    { id: "G02", stage: 2, code: "Гр. 02", name: "Варочная панель (плита)", breaker: "C32 + дифавтомат", maxWatts: 7360, cable: "ВВГ 3×6,0", color: "#dc2626", nonMaster: true },
+    { id: "G03", stage: 2, code: "Гр. 03", name: "Духовой шкаф (кухня справа)", breaker: "C16 (УЗО А 30 мА)", maxWatts: 3680, cable: "ВВГ 3×2,5", color: "#ea580c", nonMaster: true },
+    { id: "G04", stage: 2, code: "Гр. 04", name: "Стиральная машина (кухня справа)", breaker: "C16 (УЗО А 30 мА)", maxWatts: 3680, cable: "ВВГ 3×2,5", color: "#d97706", nonMaster: true },
+    { id: "G05", stage: 2, code: "Гр. 05", name: "Сушильная машина (кухня справа)", breaker: "C16 (УЗО А 30 мА)", maxWatts: 3680, cable: "ВВГ 3×2,5", color: "#ca8a04", nonMaster: true },
+    { id: "G06", stage: 2, code: "Гр. 06", name: "ПММ + мойка/фильтр/измельчитель", breaker: "C16 (УЗО А 30 мА)", maxWatts: 3680, cable: "ВВГ 3×2,5", color: "#65a30d", nonMaster: true },
+    { id: "G07", stage: 2, code: "Гр. 07", name: "Фартук кухни (чайник, СВЧ, кофе)", breaker: "C16 (УЗО А 30 мА)", maxWatts: 3680, cable: "ВВГ 3×2,5", color: "#059669", nonMaster: true },
+    { id: "G10", stage: 2, code: "Гр. 10", name: "Тёплые полы (ванная + балкон)", breaker: "C16 (УЗО А 30 мА)", maxWatts: 3680, cable: "ВВГ 3×2,5", color: "#7c3aed", nonMaster: true },
+    { id: "G11", stage: 2, code: "Гр. 11", name: "Санузел IP44+ (раковина, ПС, протечки/бойлер)", breaker: "C16 (УЗО 10 мА)", maxWatts: 3680, cable: "ВВГ 3×2,5", color: "#0891b2", nonMaster: true },
+    { id: "G13", stage: 2, code: "Гр. 13", name: "Левая половина зала + Балкон + бытовой резерв", breaker: "C16 (УЗО А 30 мА)", maxWatts: 3680, cable: "ВВГ 3×2,5", color: "#4f46e5", nonMaster: true },
+    { id: "G14", stage: 2, code: "Гр. 14", name: "Спальня (тумбы h=600) + Прихожая (резерв) + Кладовая + кормушка", breaker: "C16 (УЗО А 30 мА)", maxWatts: 3680, cable: "ВВГ 3×2,5", color: "#db2777", nonMaster: true }
   ],
   blocks: [
-    // --- ПРАВАЯ ПОЛОВИНА ЗАЛА (Гр. 12: 25 розеток + 1 RJ-45 = 2 570 Вт) ---
+    // --- ЭТАП 1: ПРАВАЯ ПОЛОВИНА ЗАЛА + ПРИХОЖАЯ (строго 24 розетки 230В под 24 устройства + 1 RJ-45 + вывод конд. + ЩР) ---
     {
-      id: "R1", room: "Зал (правая пол.)", title: "Видеосвет 3 (200 Вт) + Селфи-лампа (30 Вт)",
+      id: "R1", stage: 1, room: "Зал (правая пол.)", title: "Видеосвет 3 (200 Вт) + Селфи-лампа (30 Вт)",
       kind: "socket", sockets: 2, rj45: 0, ip44: false, watts: 230, groupId: "G12",
       wallId: "liv_top_r", x: 1095, y: 455, refSide: "left", offsetMm: 410, heightMm: 300, byPencil: true, comment: "25) Видеосвет 200 Вт + 26) Селфи-лампа 30 Вт"
     },
     {
-      id: "R2", room: "Зал (правая пол.)", title: "Шторы (электрокарниз за гардиной)",
+      id: "R2", stage: 1, room: "Зал (правая пол.)", title: "Шторы (электрокарниз за гардиной)",
       kind: "socket", sockets: 1, rj45: 0, ip44: false, watts: 65, groupId: "G12",
       wallId: "liv_top_r", x: 1355, y: 455, refSide: "right", offsetMm: 1270, heightMm: 2600, byPencil: false, comment: "55) Электрокарниз штор у потолка за гардиной"
     },
     {
-      id: "R3", room: "Зал (правая пол.)", title: "Гирлянды + Колонка бол. 1 + Видеосвет 1",
+      id: "R3", stage: 1, room: "Зал (правая пол.)", title: "Гирлянды + Колонка бол. 1 + Видеосвет 1",
       kind: "socket", sockets: 3, rj45: 0, ip44: false, watts: 530, groupId: "G12",
       wallId: "liv_top_r", x: 1495, y: 455, refSide: "right", offsetMm: 440, heightMm: 300, byPencil: true, comment: "32) Гирлянды (30 Вт) + 12) Колонка 1 (250 Вт) + 23) Видеосвет 1 (250 Вт)"
     },
     {
-      id: "R4", room: "Зал (правая пол.)", title: "Телевизор + 1 резерв (за экраном)",
-      kind: "socket", sockets: 2, rj45: 0, ip44: false, watts: 200, groupId: "G12",
-      wallId: "liv_right", x: 1570, y: 625, refSide: "left", offsetMm: 960, heightMm: 1300, byPencil: false, comment: "10) Телевизор 200 Вт + запасная розетка за ТВ"
+      id: "R4", stage: 1, room: "Зал (правая пол.)", title: "Телевизор (за экраном)",
+      kind: "socket", sockets: 1, rj45: 0, ip44: false, watts: 200, groupId: "G12",
+      wallId: "liv_right", x: 1570, y: 625, refSide: "left", offsetMm: 960, heightMm: 1300, byPencil: false, comment: "10) Телевизор 200 Вт"
     },
     {
-      id: "R5", room: "Зал (правая пол.)", title: "Макбук 1 + 2 Айфона + Колонка мал. 1",
+      id: "R5", stage: 1, room: "Зал (правая пол.)", title: "Макбук 1 + 2 Айфона + Колонка мал. 1",
       kind: "socket", sockets: 4, rj45: 0, ip44: false, watts: 190, groupId: "G12",
       wallId: "liv_pier", x: 1026, y: 655, refSide: "left", offsetMm: 1110, heightMm: 300, byPencil: true, comment: "2) Макбук (90 Вт) + 4,5) 2 Айфона (40 Вт) + 14) Колонка мал. 1 (60 Вт)"
     },
     {
-      id: "R6", room: "Зал (правая пол.)", title: "PS5 интернет RJ-45 (от роутера Cat 6)",
+      id: "R6", stage: 1, room: "Зал (правая пол.)", title: "PS5 интернет RJ-45 (от роутера Cat 6)",
       kind: "rj45", sockets: 0, rj45: 1, ip44: false, watts: 0, groupId: "G12",
       wallId: "liv_right", x: 1570, y: 710, refSide: "left", offsetMm: 1440, heightMm: 300, byPencil: false, comment: "9) Интернет-кабель Cat 6 к PlayStation от Wi-Fi роутера"
     },
     {
-      id: "R7", room: "Зал (правая пол.)", title: "PlayStation + Караоке + ЗУ камеры + ЗУ микр.",
+      id: "R7", stage: 1, room: "Зал (правая пол.)", title: "PlayStation + Караоке + ЗУ камеры + ЗУ микр.",
       kind: "socket", sockets: 4, rj45: 0, ip44: false, watts: 430, groupId: "G12",
       wallId: "liv_right", x: 1570, y: 795, refSide: "left", offsetMm: 1920, heightMm: 300, byPencil: true, comment: "9) PS5 (350 Вт) + 31) Микр. (30 Вт) + 35) ЗУ кам. (30 Вт) + 36) ЗУ микр. (20 Вт)"
     },
     {
-      id: "R8", room: "Зал (правая пол.)", title: "Колонка бол. 2 + Видеосвет 2",
+      id: "R8", stage: 1, room: "Зал (правая пол.)", title: "Колонка бол. 2 + Видеосвет 2",
       kind: "socket", sockets: 2, rj45: 0, ip44: false, watts: 500, groupId: "G12",
       wallId: "liv_right", x: 1570, y: 915, refSide: "right", offsetMm: 400, heightMm: 300, byPencil: true, comment: "13) Колонка большая 2 (250 Вт) + 24) Видеосвет 2 (250 Вт)"
     },
     {
-      id: "R9", room: "Зал (правая пол.)", title: "Проектор + Колонка мал. 2 + резерв",
-      kind: "socket", sockets: 3, rj45: 0, ip44: false, watts: 260, groupId: "G12",
-      wallId: "liv_bot", x: 1115, y: 1311, refSide: "left", offsetMm: 860, heightMm: 300, byPencil: true, comment: "1) Проектор (200 Вт) + 15) Колонка мал. 2 (60 Вт) + 1 резерв"
+      id: "R9", stage: 1, room: "Зал (правая пол.)", title: "Проектор + Колонка мал. 2",
+      kind: "socket", sockets: 2, rj45: 0, ip44: false, watts: 260, groupId: "G12",
+      wallId: "liv_bot", x: 1115, y: 1311, refSide: "left", offsetMm: 860, heightMm: 300, byPencil: true, comment: "1) Проектор (200 Вт) + 15) Колонка мал. 2 (60 Вт)"
     },
     {
-      id: "R10", room: "Зал (правая пол.)", title: "Макбук 2 + 2 Айфона + Андроид",
+      id: "R10", stage: 1, room: "Зал (правая пол.)", title: "Макбук 2 + 2 Айфона + Андроид",
       kind: "socket", sockets: 4, rj45: 0, ip44: false, watts: 165, groupId: "G12",
-      wallId: "liv_bot", x: 1405, y: 1311, refSide: "right", offsetMm: 900, heightMm: 300, byPencil: true, comment: "3) Макбук (90 Вт) + 6,7) 2 Айфона (40 Вт) + 8) Андроид (35 Вт)"
+      wallId: "liv_bot", x: 1405, y: 1311, refSide: "right", offsetMm: 1880, heightMm: 300, byPencil: true, comment: "3) Макбук (90 Вт) + 6,7) 2 Айфона (40 Вт) + 8) Андроид (35 Вт)"
+    },
+    {
+      id: "R13", stage: 1, room: "Зал (правая пол.)", title: "ВЫВОД КОНДИЦИОНЕРА (без розетки)",
+      kind: "cable", sockets: 0, rj45: 0, ip44: false, watts: 1400, groupId: "G09",
+      wallId: "ac_door", x: 865, y: 1580, refSide: "left", offsetMm: 510, heightMm: 2450, byPencil: false, comment: "38) Прямой вывод 3×2,5 БЕЗ розетки над дверью спальни (дует в зал)"
+    },
+    {
+      id: "R15", stage: 1, room: "Прихожая", title: "Wi-Fi роутер (ВНЕ ЩР)",
+      kind: "socket", sockets: 1, rj45: 0, ip44: false, watts: 30, groupId: "G08",
+      wallId: "hall_right", x: 1855, y: 1455, refSide: "right", offsetMm: 300, heightMm: 2150, byPencil: false, comment: "22) Wi-Fi роутер h=2150 ВНЕ железного щита; отсюда витая пара Cat 6 в зал"
+    },
+    {
+      id: "R16", stage: 1, room: "Прихожая", title: "Щит ЩР (36–48 мод. над М)",
+      kind: "shield", sockets: 0, rj45: 0, ip44: false, watts: 0, groupId: "G08",
+      wallId: "hall_bot", x: 1800, y: 1511, refSide: "left", offsetMm: 460, heightMm: 1700, byPencil: false, comment: "Ось 460 мм (1/2 стены 920 мм), строго над мастером М"
     },
 
-    // --- ЛЕВАЯ ПОЛОВИНА ЗАЛА + КОНДИЦИОНЕР ---
+    // --- ЭТАП 2: ОСТАЛЬНЫЕ ПОМЕЩЕНИЯ И БЫТОВОЙ РЕЗЕРВ ---
     {
-      id: "R11", room: "Зал (левая пол.)", title: "Зал лево верх (3×230В + RJ-45 Cat 6)",
+      id: "R11", stage: 2, room: "Зал (левая пол.)", title: "Зал лево верх (3×230В + RJ-45 Cat 6)",
       kind: "socket", sockets: 3, rj45: 1, ip44: false, watts: 350, groupId: "G13",
       wallId: "liv_top_l", x: 585, y: 455, refSide: "left", offsetMm: 560, heightMm: 300, byPencil: true, comment: "Стол/ПК + проводной RJ-45 Cat 6 от роутера"
     },
     {
-      id: "R12", room: "Зал (левая пол.)", title: "Зал левая стена под окном",
+      id: "R12", stage: 2, room: "Зал (левая пол.)", title: "Зал левая стена под окном",
       kind: "socket", sockets: 2, rj45: 0, ip44: false, watts: 200, groupId: "G13",
       wallId: "liv_left", x: 488, y: 1005, refSide: "right", offsetMm: 430, heightMm: 300, byPencil: true, comment: "По карандашной разметке на стене (резерв под пылесос/лампу)"
     },
     {
-      id: "R13", room: "Зал (правая пол.)", title: "ВЫВОД КОНДИЦИОНЕРА (без розетки)",
-      kind: "cable", sockets: 0, rj45: 0, ip44: false, watts: 1400, groupId: "G09",
-      wallId: "ac_door", x: 865, y: 1580, refSide: "left", offsetMm: 510, heightMm: 2450, byPencil: false, comment: "38) Прямой вывод 3×2,5 БЕЗ розетки над дверью спальни (дует в зал)"
-    },
-
-    // --- ПРИХОЖАЯ + ЩИТ ЩР + РОУТЕР + КЛАДОВАЯ ---
-    {
-      id: "R14", room: "Прихожая", title: "Прихожая у входа (пылесос/сушилка)",
+      id: "R14", stage: 2, room: "Прихожая (резерв 2 этап)", title: "Прихожая у входа (пылесос/сушилка)",
       kind: "socket", sockets: 2, rj45: 0, ip44: false, watts: 300, groupId: "G14",
       wallId: "hall_right", x: 1855, y: 1345, refSide: "right", offsetMm: 900, heightMm: 300, byPencil: true, comment: "Дежурная двойная розетка по карандашу"
     },
     {
-      id: "R15", room: "Прихожая", title: "Wi-Fi роутер + оптический терминал (ВНЕ ЩР)",
-      kind: "socket", sockets: 2, rj45: 0, ip44: false, watts: 30, groupId: "G08",
-      wallId: "hall_right", x: 1855, y: 1455, refSide: "right", offsetMm: 300, heightMm: 2150, byPencil: false, comment: "22) Роутер + оптика h=2150 ВНЕ железного щита; отсюда 2×Cat 6 в зал"
-    },
-    {
-      id: "R16", room: "Прихожая", title: "Щит ЩР (36–48 мод. над М) + зона Wi-Fi",
-      kind: "shield", sockets: 0, rj45: 0, ip44: false, watts: 0, groupId: "G08",
-      wallId: "hall_bot", x: 1800, y: 1511, refSide: "left", offsetMm: 460, heightMm: 1700, byPencil: false, comment: "Ось 460 мм (1/2 стены 920 мм), строго над мастером М"
-    },
-    {
-      id: "R17", room: "Кладовая", title: "База робота-пылесоса / зарядка",
+      id: "R17", stage: 2, room: "Кладовая", title: "База робота-пылесоса / зарядка",
       kind: "socket", sockets: 2, rj45: 0, ip44: false, watts: 100, groupId: "G14",
       wallId: "pantry_top", x: 1165, y: 1355, refSide: "left", offsetMm: 850, heightMm: 300, byPencil: false, comment: "Запитана ДО М; робот на зарядке 24/7"
     },
-
-    // --- КУХНЯ (ВСЯ ОСНОВНАЯ ТЕХНИКА СПРАВА, ХОЛОДИЛЬНИК СЛЕВА) ---
     {
-      id: "R18", room: "Кухня", title: "Стиральная + сушильная машины (сбоку в тумбе)",
+      id: "R18", stage: 2, room: "Кухня", title: "Стиральная + сушильная машины (сбоку в тумбе)",
       kind: "socket", sockets: 2, rj45: 0, ip44: false, watts: 2200, groupId: "G04",
       wallId: "kitch_right", x: 2083, y: 492, refSide: "left", offsetMm: 480, heightMm: 400, byPencil: false, comment: "2 отдельные линии (Гр. 04 + Гр. 05), ставить сбоку от машин"
     },
     {
-      id: "R19", room: "Кухня", title: "Посудомойка + мойка/фильтр/измельчитель",
+      id: "R19", stage: 2, room: "Кухня", title: "Посудомойка + мойка/фильтр/измельчитель",
       kind: "socket", sockets: 2, rj45: 0, ip44: false, watts: 2100, groupId: "G06",
       wallId: "kitch_right", x: 2083, y: 595, refSide: "left", offsetMm: 1000, heightMm: 450, byPencil: false, comment: "Розетка ПММ строго в тумбе под мойкой (не за корпусом ПММ)"
     },
     {
-      id: "R20", room: "Кухня", title: "Фартук кухни — блок 1 (3×)",
+      id: "R20", stage: 2, room: "Кухня", title: "Фартук кухни — блок 1 (3×)",
       kind: "socket", sockets: 3, rj45: 0, ip44: false, watts: 1500, groupId: "G07",
       wallId: "kitch_right", x: 2083, y: 695, refSide: "left", offsetMm: 1510, heightMm: 1050, byPencil: false, comment: "Чайник / кофемашина / блендер"
     },
     {
-      id: "R21", room: "Кухня", title: "Фартук кухни — блок 2 (3×)",
+      id: "R21", stage: 2, room: "Кухня", title: "Фартук кухни — блок 2 (3×)",
       kind: "socket", sockets: 3, rj45: 0, ip44: false, watts: 1200, groupId: "G07",
       wallId: "kitch_right", x: 2083, y: 790, refSide: "right", offsetMm: 1220, heightMm: 1050, byPencil: false, comment: "СВЧ / тостер / мультиварка"
     },
     {
-      id: "R22", room: "Кухня", title: "Духовка (h=300) + Скрытая вытяжка (h=2150)",
+      id: "R22", stage: 2, room: "Кухня", title: "Духовка (h=300) + Скрытая вытяжка (h=2150)",
       kind: "socket", sockets: 2, rj45: 0, ip44: false, watts: 2800, groupId: "G03",
       wallId: "kitch_right", x: 2083, y: 885, refSide: "right", offsetMm: 740, heightMm: 300, byPencil: false, comment: "Духовка Гр. 03 (h=300) + вытяжка без выкл. Гр. 08 (h=2150)"
     },
     {
-      id: "R23", room: "Кухня", title: "Варочная панель / плита у входа (3×6,0)",
+      id: "R23", stage: 2, room: "Кухня", title: "Варочная панель / плита у входа (3×6,0)",
       kind: "power", sockets: 0, rj45: 0, ip44: false, watts: 7000, groupId: "G02",
       wallId: "kitch_right", x: 2083, y: 975, refSide: "right", offsetMm: 280, heightMm: 300, byPencil: false, comment: "Прямой силовой кабель 3×6,0 мм² на C32"
     },
     {
-      id: "R24", room: "Кухня", title: "Холодильник слева (НЕОТКЛЮЧАЕМЫЙ ДО М)",
+      id: "R24", stage: 2, room: "Кухня", title: "Холодильник слева (НЕОТКЛЮЧАЕМЫЙ ДО М)",
       kind: "socket", sockets: 1, rj45: 0, ip44: false, watts: 250, groupId: "G08",
       wallId: "kitch_left", x: 1613, y: 590, refSide: "right", offsetMm: 980, heightMm: 300, byPencil: false, comment: "Строго ДО контактора М на Гр. 08"
     },
     {
-      id: "R25", room: "Кухня", title: "Кормушка и поилка котов (слева, ДО М)",
+      id: "R25", stage: 2, room: "Кухня", title: "Кормушка и поилка котов (слева, ДО М)",
       kind: "socket", sockets: 2, rj45: 0, ip44: false, watts: 40, groupId: "G14",
       wallId: "kitch_left", x: 1613, y: 855, refSide: "left", offsetMm: 670, heightMm: 300, byPencil: false, comment: "Питание 24/7 ДО контактора М"
     },
-
-    // --- САНУЗЕЛ И БАЛКОН ---
     {
-      id: "R26", room: "Санузел", title: "У раковины 2×IP44+ (фен, щётка, ирригатор)",
+      id: "R26", stage: 2, room: "Санузел", title: "У раковины 2×IP44+ (фен, щётка, ирригатор)",
       kind: "socket", sockets: 2, rj45: 0, ip44: true, watts: 1800, groupId: "G11",
       wallId: "bath_top", x: 685, y: 1118, refSide: "right", offsetMm: 290, heightMm: 950, byPencil: false, comment: "УЗО 10 мА; в перегородке 105 мм ставить подрозетники 45 мм"
     },
     {
-      id: "R27", room: "Санузел", title: "Полотенцесушитель (вывод 3×2,5 без розетки)",
+      id: "R27", stage: 2, room: "Санузел", title: "Полотенцесушитель (вывод 3×2,5 без розетки)",
       kind: "cable", sockets: 0, rj45: 0, ip44: true, watts: 350, groupId: "G11",
       wallId: "bath_right", x: 725, y: 1300, refSide: "left", offsetMm: 1110, heightMm: 800, byPencil: false, comment: "Скрытое подключение"
     },
     {
-      id: "R28", room: "Санузел", title: "Защита от протечек / бойлер 2×IP44+",
+      id: "R28", stage: 2, room: "Санузел", title: "Защита от протечек / бойлер 2×IP44+",
       kind: "socket", sockets: 2, rj45: 0, ip44: true, watts: 1500, groupId: "G11",
       wallId: "bath_right", x: 725, y: 1395, refSide: "right", offsetMm: 1200, heightMm: 300, byPencil: false, comment: "В сантехшкафу, УЗО 10 мА"
     },
     {
-      id: "R29", room: "Санузел", title: "Регулятор тёплого пола санузла",
+      id: "R29", stage: 2, room: "Санузел", title: "Регулятор тёплого пола санузла",
       kind: "thermo", sockets: 0, rj45: 0, ip44: false, watts: 450, groupId: "G10",
       wallId: "bath_entry", x: 769, y: 1475, refSide: "right", offsetMm: 410, heightMm: 900, byPencil: true, comment: "По выведенному датчику уже уложенного ТП"
     },
     {
-      id: "R30", room: "Балкон", title: "Регулятор тёплого пола балкона",
+      id: "R30", stage: 2, room: "Балкон", title: "Регулятор тёплого пола балкона",
       kind: "thermo", sockets: 0, rj45: 0, ip44: false, watts: 600, groupId: "G10",
       wallId: "balc_bot", x: 1595, y: 352, refSide: "left", offsetMm: 155, heightMm: 900, byPencil: true, comment: "По выведенному датчику уже уложенного ТП"
     },
     {
-      id: "R31", room: "Балкон", title: "Балкон (одиночная 1×IP44+)",
+      id: "R31", stage: 2, room: "Балкон", title: "Балкон (одиночная 1×IP44+)",
       kind: "socket", sockets: 1, rj45: 0, ip44: true, watts: 500, groupId: "G13",
       wallId: "balc_bot", x: 1665, y: 352, refSide: "left", offsetMm: 590, heightMm: 300, byPencil: false, comment: "Посажена на Гр. 13 (отдельно от правой половины зала)"
     },
-
-    // --- СПАЛЬНЯ ---
     {
-      id: "R32", room: "Спальня", title: "Тумба 1: над тумбой (ось 855 мм, сдвиг 150 от света)",
+      id: "R32", stage: 2, room: "Спальня", title: "Тумба 1: над тумбой (ось 855 мм, сдвиг 150 от света)",
       kind: "socket", sockets: 2, rj45: 0, ip44: false, watts: 150, groupId: "G14",
       wallId: "bed_right", x: 955, y: 1785, refSide: "left", offsetMm: 855, heightMm: 600, byPencil: false, comment: "Над тумбой на уровне нижнего поста света h=600"
     },
     {
-      id: "R33", room: "Спальня", title: "Тумба 2: над тумбой (ось 855 мм, сдвиг 150 от света)",
+      id: "R33", stage: 2, room: "Спальня", title: "Тумба 2: над тумбой (ось 855 мм, сдвиг 150 от света)",
       kind: "socket", sockets: 2, rj45: 0, ip44: false, watts: 150, groupId: "G14",
       wallId: "bed_right", x: 955, y: 2045, refSide: "right", offsetMm: 855, heightMm: 600, byPencil: false, comment: "Над тумбой на уровне нижнего поста света h=600"
     },
     {
-      id: "R34", room: "Спальня", title: "Спальня напротив кровати (левая стена)",
+      id: "R34", stage: 2, room: "Спальня", title: "Спальня напротив кровати (левая стена)",
       kind: "socket", sockets: 2, rj45: 0, ip44: false, watts: 300, groupId: "G14",
       wallId: "bed_left", x: 463, y: 1885, refSide: "right", offsetMm: 1560, heightMm: 300, byPencil: true, comment: "По карандашной разметке на стене"
     }
@@ -3908,7 +3988,7 @@ window.SOCKETS_DATA = {
   }
 
   const SVG_NS = "http://www.w3.org/2000/svg";
-  const STORAGE_KEY = "sockets_editor_v1_state";
+  const STORAGE_KEY = "sockets_editor_v15_stage1_24";
 
   function deepClone(obj) {
     return JSON.parse(JSON.stringify(obj));
@@ -3921,7 +4001,8 @@ window.SOCKETS_DATA = {
   const state = {
     groups: deepClone(BASELINE_GROUPS),
     blocks: deepClone(BASELINE_BLOCKS),
-    activeGroups: { G12: true },
+    activeGroups: { G12: true, G08: true, G09: true },
+    zoneMode: "stage1_hide", // "stage1_hide" | "stage1_gray" | "all"
     selectedBlockId: null,
     hoveredBlockId: null,
     activeTab: "blocks",
@@ -3939,6 +4020,7 @@ window.SOCKETS_DATA = {
   const socketsLayerEl = document.getElementById("layer-sockets");
   const inspectorEl = document.getElementById("selected-inspector");
   const tabContentEl = document.getElementById("tab-content");
+  const statSocketsWrapEl = document.getElementById("stat-sockets-wrap");
   const statSocketsEl = document.getElementById("stat-sockets");
   const statRj45El = document.getElementById("stat-rj45");
   const statWattsEl = document.getElementById("stat-watts");
@@ -3958,6 +4040,26 @@ window.SOCKETS_DATA = {
   const undoStack = [];
   const redoStack = [];
   let toastTimer = null;
+
+  function isStage1Block(b) {
+    return !!b && b.stage !== 2;
+  }
+
+  function isStage1Mode() {
+    return state.zoneMode !== "all";
+  }
+
+  function getActiveWalls() {
+    return isStage1Mode()
+      ? DATA.wallSegments.filter((w) => w.stage === 1)
+      : DATA.wallSegments;
+  }
+
+  function syncZoneButtonsUI() {
+    document.querySelectorAll(".zone-btn[data-zone-mode]").forEach((btn) => {
+      btn.classList.toggle("is-active", btn.getAttribute("data-zone-mode") === state.zoneMode);
+    });
+  }
 
   /* ==================== PERSISTENCE & UNDO/REDO ==================== */
 
@@ -4000,7 +4102,7 @@ window.SOCKETS_DATA = {
       if (!parsed || !Array.isArray(parsed.groups) || !Array.isArray(parsed.blocks)) return;
       state.groups = parsed.groups;
       state.blocks = parsed.blocks;
-      state.activeGroups = parsed.activeGroups || { G12: true };
+      state.activeGroups = parsed.activeGroups || { G12: true, G08: true, G09: true };
       const selId = parsed.selectedBlockId || null;
       state.selectedBlockId = selId && state.blocks.some((b) => b.id === selId) ? selId : null;
       saveToStorage();
@@ -4059,6 +4161,7 @@ window.SOCKETS_DATA = {
           groups: state.groups,
           blocks: state.blocks,
           activeGroups: state.activeGroups,
+          zoneMode: state.zoneMode,
           showDims: state.showDims
         })
       );
@@ -4073,7 +4176,10 @@ window.SOCKETS_DATA = {
       if (parsed && Array.isArray(parsed.groups) && Array.isArray(parsed.blocks)) {
         state.groups = parsed.groups;
         state.blocks = parsed.blocks;
-        state.activeGroups = parsed.activeGroups || { G12: true };
+        state.activeGroups = parsed.activeGroups || { G12: true, G08: true, G09: true };
+        if (parsed.zoneMode === "stage1_hide" || parsed.zoneMode === "stage1_gray" || parsed.zoneMode === "all") {
+          state.zoneMode = parsed.zoneMode;
+        }
         state.showDims = parsed.showDims !== false;
       }
     } catch (e) {}
@@ -4143,8 +4249,8 @@ window.SOCKETS_DATA = {
 
   function findNearestWall(px, py, maxDist) {
     let best = null;
-    let bestDist = typeof maxDist === "number" ? maxDist : 58;
-    DATA.wallSegments.forEach((wall) => {
+    let bestDist = typeof maxDist === "number" ? maxDist : (isStage1Mode() ? 75 : 58);
+    getActiveWalls().forEach((wall) => {
       const pr = projectOntoSegment(px, py, wall.x1, wall.y1, wall.x2, wall.y2);
       if (pr.dist < bestDist) {
         bestDist = pr.dist;
@@ -4191,7 +4297,9 @@ window.SOCKETS_DATA = {
 
   function getGroupTotals(gid) {
     const grp = getGroupById(gid);
-    const members = state.blocks.filter((b) => b.groupId === gid && b.kind !== "shield");
+    const members = state.blocks.filter(
+      (b) => b.groupId === gid && b.kind !== "shield" && (!isStage1Mode() || isStage1Block(b))
+    );
     const watts = members.reduce((s, b) => s + (Number(b.watts) || 0), 0);
     const socketsCount = members.reduce((s, b) => s + (Number(b.sockets) || 0), 0);
     const rj45Count = members.reduce((s, b) => s + (Number(b.rj45) || 0), 0);
@@ -4271,15 +4379,36 @@ window.SOCKETS_DATA = {
 
   function buildExportMarkdown() {
     const diffs = computeEditsSummary();
-    const lines = ["### Правки и ведомость розеток / RJ-45"];
+    const lines = [
+      isStage1Mode()
+        ? "### Правки и ведомость розеток — Этап 1 (Правая половина зала + Прихожая)"
+        : "### Правки и ведомость розеток / RJ-45"
+    ];
     if (diffs.length) {
       lines.push("", "**Изменения относительно базового плана:**");
       diffs.forEach((d) => lines.push(`- ${d}`));
     } else {
-      lines.push("", "_Изменений относительно базовой схемы розеток v=12 пока нет._");
+      lines.push("", "_Изменений относительно базовой схемы розеток v=15 пока нет._");
+    }
+    if (isStage1Mode()) {
+      const s1Blocks = state.blocks.filter((b) => isStage1Block(b) && b.kind !== "shield");
+      const s1SockTotal = s1Blocks.reduce((s, b) => s + (Number(b.sockets) || 0), 0);
+      const s1RjTotal = s1Blocks.reduce((s, b) => s + (Number(b.rj45) || 0), 0);
+      const s1WattsTotal = s1Blocks.reduce((s, b) => s + (Number(b.watts) || 0), 0);
+      lines.push("", `**Точки Этапа 1 (Итого: ${s1SockTotal} роз. 230В, ${s1RjTotal} RJ-45, ${s1WattsTotal} Вт с конд.):**`);
+      s1Blocks.forEach((b) => {
+        const wall = b.wallId ? wallById.get(b.wallId) : null;
+        const sideTxt = b.refSide === "right" ? "от правой стены" : "от левой стены";
+        const posTxt = wall ? `${wall.label}, ${b.offsetMm} мм ${sideTxt}` : `свободно (${b.x}, ${b.y})`;
+        const grp = getGroupById(b.groupId);
+        lines.push(`- **${b.id}** (${b.title}): ${formatBlockTypeSummary(b)}, ${grp ? grp.code : b.groupId}, h=${b.heightMm} мм, ${posTxt}, ${b.watts} Вт`);
+      });
     }
     lines.push("", "**Сводка по группам щита ЩР:**");
-    state.groups.forEach((g) => {
+    const groupsList = isStage1Mode()
+      ? state.groups.filter((g) => g.stage !== 2 || state.blocks.some((b) => isStage1Block(b) && b.groupId === g.id))
+      : state.groups;
+    groupsList.forEach((g) => {
       const t = getGroupTotals(g.id);
       lines.push(`- **${g.code}** (${g.name}, ${g.breaker}): ${t.socketsCount} роз. 230В, ${t.rj45Count} RJ-45, **${t.watts} Вт** (${t.amps.toFixed(1)} А)`);
     });
@@ -4300,7 +4429,7 @@ window.SOCKETS_DATA = {
     });
 
     // Subtle highlighted clickable wall guides when dragging or selecting
-    DATA.wallSegments.forEach((w) => {
+    getActiveWalls().forEach((w) => {
       wallGuidesEl.appendChild(
         createSvgEl("line", {
           x1: w.x1, y1: w.y1, x2: w.x2, y2: w.y2,
@@ -4313,6 +4442,7 @@ window.SOCKETS_DATA = {
     dimsLayerEl.innerHTML = "";
     const focusId = state.hoveredBlockId || state.selectedBlockId;
     state.blocks.forEach((b) => {
+      if (isStage1Mode() && !isStage1Block(b)) return;
       const isFocused = b.id === focusId;
       if (!isFocused && !state.showDims) return;
       if (!b.wallId) return;
@@ -4350,14 +4480,19 @@ window.SOCKETS_DATA = {
   function renderSocketMarkers() {
     socketsLayerEl.innerHTML = "";
     state.blocks.forEach((b) => {
+      const inStage1 = isStage1Block(b);
+      if (state.zoneMode === "stage1_hide" && !inStage1) return;
+      const isOtherLocked = state.zoneMode === "stage1_gray" && !inStage1;
+
       const grp = getGroupById(b.groupId);
-      const isSelected = state.selectedBlockId === b.id;
-      const isGrpOn = !!state.activeGroups[b.groupId];
+      const isSelected = !isOtherLocked && state.selectedBlockId === b.id;
+      const isGrpOn = !isOtherLocked && !!state.activeGroups[b.groupId];
       const wall = b.wallId ? wallById.get(b.wallId) : null;
       const isVertWall = wall && Math.abs(wall.y2 - wall.y1) > Math.abs(wall.x2 - wall.x1);
 
       const el = document.createElement("div");
       el.className = "socket-marker";
+      if (isOtherLocked) el.classList.add("is-other-zone");
       if (isSelected) el.classList.add("is-selected");
       if (isGrpOn) el.classList.add("is-group-on");
       el.style.left = `${b.x}px`;
@@ -4374,7 +4509,7 @@ window.SOCKETS_DATA = {
       if (b.kind === "thermo") frame.classList.add("is-thermo");
       if (b.kind === "shield") frame.classList.add("is-shield");
 
-      if (grp && !b.ip44 && b.kind === "socket" && b.sockets > 0 && !isGrpOn) {
+      if (!isOtherLocked && grp && !b.ip44 && b.kind === "socket" && b.sockets > 0 && !isGrpOn) {
         frame.style.borderColor = grp.color;
       }
 
@@ -4414,21 +4549,43 @@ window.SOCKETS_DATA = {
         el.appendChild(tag);
       }
 
-      bindBlockMarkerEvents(el, b);
+      if (!isOtherLocked) {
+        bindBlockMarkerEvents(el, b);
+      }
       socketsLayerEl.appendChild(el);
     });
   }
 
   function renderStatsAndBadges() {
-    const totalSockets = state.blocks.reduce((s, b) => s + (Number(b.sockets) || 0), 0);
-    const totalRj45 = state.blocks.reduce((s, b) => s + (Number(b.rj45) || 0), 0);
-    const activeWatts = state.blocks
+    const s1Mode = isStage1Mode();
+    const countedBlocks = s1Mode ? state.blocks.filter(isStage1Block) : state.blocks;
+    const totalSockets = countedBlocks.reduce((s, b) => s + (Number(b.sockets) || 0), 0);
+    const totalRj45 = countedBlocks.reduce((s, b) => s + (Number(b.rj45) || 0), 0);
+    const activeWatts = countedBlocks
       .filter((b) => state.activeGroups[b.groupId])
       .reduce((s, b) => s + (Number(b.watts) || 0), 0);
-    statSocketsEl.textContent = String(totalSockets);
+
+    if (s1Mode) {
+      const target = DATA.stage1TargetSockets || 24;
+      const diff = totalSockets - target;
+      if (diff === 0) {
+        statSocketsWrapEl.classList.add("is-exact");
+        statSocketsWrapEl.classList.remove("is-mismatch");
+        statSocketsWrapEl.innerHTML = `Розеток (этап 1): <strong id="stat-sockets">${totalSockets} / ${target} ✓</strong>`;
+      } else {
+        statSocketsWrapEl.classList.remove("is-exact");
+        statSocketsWrapEl.classList.add("is-mismatch");
+        const signDiff = diff > 0 ? `+${diff}` : String(diff);
+        statSocketsWrapEl.innerHTML = `Розеток (этап 1): <strong id="stat-sockets">${totalSockets} из ${target} (${signDiff}) ⚠️</strong>`;
+      }
+    } else {
+      statSocketsWrapEl.classList.remove("is-exact", "is-mismatch");
+      statSocketsWrapEl.innerHTML = `Розеток всего: <strong id="stat-sockets">${totalSockets}</strong>`;
+    }
+
     statRj45El.textContent = String(totalRj45);
     statWattsEl.textContent = `${activeWatts.toLocaleString("ru-RU")} Вт`;
-    tabBlocksCountEl.textContent = String(state.blocks.length);
+    tabBlocksCountEl.textContent = String(countedBlocks.length);
 
     const diffCount = computeEditsSummary().length;
     editsBtnCountEl.textContent = String(diffCount);
@@ -4454,9 +4611,11 @@ window.SOCKETS_DATA = {
     const groupOpts = state.groups
       .map((g) => `<option value="${escapeHtml(g.id)}" ${g.id === b.groupId ? "selected" : ""}>${escapeHtml(g.code)} — ${escapeHtml(g.name)}</option>`)
       .join("");
+    const activeWalls = getActiveWalls();
+    const wallList = wall && !activeWalls.some((w) => w.id === wall.id) ? [wall, ...activeWalls] : activeWalls;
     const wallOpts = [
       `<option value="" ${!b.wallId ? "selected" : ""}>Без привязки к стене (свободно)</option>`,
-      ...DATA.wallSegments.map((w) => `<option value="${escapeHtml(w.id)}" ${w.id === b.wallId ? "selected" : ""}>${escapeHtml(w.label)}</option>`)
+      ...wallList.map((w) => `<option value="${escapeHtml(w.id)}" ${w.id === b.wallId ? "selected" : ""}>${escapeHtml(w.label)}</option>`)
     ].join("");
 
     const heightPresets = [300, 400, 600, 900, 950, 1050, 1300, 2150, 2450, 2600];
@@ -4482,6 +4641,11 @@ window.SOCKETS_DATA = {
             )
             .join("")}
         </div>
+        ${
+          b.kind === "socket" && b.sockets >= 2
+            ? `<button type="button" class="step-btn" id="ins-split-btn" style="width:100%;margin-top:6px;background:#eff6ff;border-color:#93c5fd;color:#1e3a8a;">✂️ Отделить 1 розетку в отдельный блок (сумма не изменится)</button>`
+            : ""
+        }
         <span class="ed-label" style="margin-top:7px;">Интернет-розетка RJ-45 (Cat 6) и влагозащита</span>
         <div class="seg-row">
           ${[0, 1, 2]
@@ -4589,6 +4753,47 @@ window.SOCKETS_DATA = {
     document.getElementById("ins-dup-btn").addEventListener("click", () => {
       duplicateBlock(b);
     });
+    const splitBtn = document.getElementById("ins-split-btn");
+    if (splitBtn) {
+      splitBtn.addEventListener("click", () => {
+        if (b.sockets < 2) return;
+        pushUndoSnapshot();
+        const prevCount = b.sockets;
+        const totalWatts = Number(b.watts) || 0;
+        const splitWatts = Math.round(totalWatts / prevCount / 10) * 10;
+        b.sockets = prevCount - 1;
+        b.watts = Math.max(0, totalWatts - splitWatts);
+
+        const nb = {
+          id: getNextBlockId(),
+          stage: b.stage || 1,
+          room: b.room,
+          title: `${b.title} (отдел. 1×)`,
+          kind: "socket",
+          sockets: 1,
+          rj45: 0,
+          ip44: !!b.ip44,
+          watts: splitWatts,
+          groupId: b.groupId,
+          wallId: b.wallId,
+          refSide: b.refSide || "left",
+          offsetMm: b.offsetMm || 300,
+          heightMm: b.heightMm || 300,
+          byPencil: !!b.byPencil,
+          x: b.x + 48,
+          y: b.y,
+          comment: "Отделено из блока " + b.id
+        };
+        if (wall) {
+          const nextOff = nb.offsetMm + 220 <= wall.lengthMm ? nb.offsetMm + 220 : Math.max(0, nb.offsetMm - 220);
+          moveBlockToWallOffset(nb, wall, nb.refSide, nextOff);
+        }
+        state.blocks.push(nb);
+        state.selectedBlockId = nb.id;
+        saveToStorage();
+        renderAll();
+      });
+    }
     inspectorEl.querySelectorAll("[data-set-sockets]").forEach((btn) => {
       btn.addEventListener("click", () => {
         pushUndoSnapshot();
@@ -4778,9 +4983,11 @@ window.SOCKETS_DATA = {
   }
 
   function renderSidebarTab() {
+    const s1Mode = isStage1Mode();
     if (state.activeTab === "blocks") {
       const grouped = new Map();
-      state.blocks.forEach((b) => {
+      const visibleBlocks = s1Mode ? state.blocks.filter(isStage1Block) : state.blocks;
+      visibleBlocks.forEach((b) => {
         const rm = b.room || "Прочее";
         if (!grouped.has(rm)) grouped.set(rm, []);
         grouped.get(rm).push(b);
@@ -4813,7 +5020,10 @@ window.SOCKETS_DATA = {
           return `<div class="room-group"><div class="room-group-hdr"><span>${escapeHtml(rm)}</span><span>${rmSocks} роз. · ${rmWatts} Вт</span></div>${itemsHtml}</div>`;
         })
         .join("");
-      tabContentEl.innerHTML = html || "<div class='inspector-empty'>Нет точек розеток.</div>";
+      const stageNote = s1Mode
+        ? `<div class="inspector-empty" style="margin-bottom:8px;padding:7px 9px;background:#eff6ff;border:1px solid #bfdbfe;border-radius:7px;font-size:11px;">🎯 Показан <b>только Этап 1</b> (Правая половина зала + Прихожая). Остальные комнаты не перемешиваются.</div>`
+        : "";
+      tabContentEl.innerHTML = (html ? stageNote + html : "<div class='inspector-empty'>Нет точек розеток.</div>");
 
       tabContentEl.querySelectorAll("[data-select-block]").forEach((el) => {
         el.addEventListener("click", (e) => {
@@ -4840,7 +5050,10 @@ window.SOCKETS_DATA = {
         <span style="font-size:11.5px;color:#475569;font-weight:700;">Нажмите на группу, чтобы подсветить её розетки на плане:</span>
         <button type="button" class="btn-primary" id="btn-tab-add-grp" style="padding:4px 8px;font-size:11px;">+ Группа</button>
       </div>`;
-      const cardsHtml = state.groups
+      const visibleGroups = s1Mode
+        ? state.groups.filter((g) => g.stage !== 2 || state.blocks.some((b) => isStage1Block(b) && b.groupId === g.id))
+        : state.groups;
+      const cardsHtml = visibleGroups
         .map((g) => {
           const t = getGroupTotals(g.id);
           const isOn = !!state.activeGroups[g.id];
@@ -4862,7 +5075,10 @@ window.SOCKETS_DATA = {
             </div>`;
         })
         .join("");
-      tabContentEl.innerHTML = topBtn + cardsHtml;
+      const stage2GrpNote = s1Mode
+        ? `<div class="inspector-empty" style="margin-top:8px;padding:7px 9px;background:#f8fafc;border:1px dashed #cbd5e1;border-radius:7px;font-size:11px;">Линии остальных комнат (кухня, с/у, спальня, балкон) относятся ко <b>2-му этапу</b> и скрыты, чтобы не путаться. Переключите режим на «🔓 Все комнаты», чтобы увидеть их.</div>`
+        : "";
+      tabContentEl.innerHTML = topBtn + cardsHtml + stage2GrpNote;
       document.getElementById("btn-tab-add-grp").addEventListener("click", () => openAddGroupModal(null));
       tabContentEl.querySelectorAll("[data-toggle-grp]").forEach((card) => {
         card.addEventListener("click", () => {
@@ -4879,7 +5095,7 @@ window.SOCKETS_DATA = {
     const diffs = computeEditsSummary();
     tabContentEl.innerHTML = diffs.length
       ? diffs.map((d) => `<div class="block-item" style="font-size:11.5px;">• ${escapeHtml(d)}</div>`).join("")
-      : `<div class="inspector-empty">Изменений относительно базовой схемы v=12 пока нет. Любая перестановка, добавление 1–5 розеток, RJ-45, смена группы или высоты/отступа появится здесь.</div>`;
+      : `<div class="inspector-empty">Изменений относительно базовой схемы v=15 (24 розетки Этапа 1) пока нет. Любая перестановка, отделение розетки, смена группы или высоты/отступа появится здесь.</div>`;
   }
 
   function renderAll() {
@@ -4938,10 +5154,11 @@ window.SOCKETS_DATA = {
   }
 
   function openAddSocketModal() {
-    const wallOpts = DATA.wallSegments
+    const wallOpts = getActiveWalls()
       .map((w) => `<option value="${escapeHtml(w.id)}" ${w.id === "liv_right" ? "selected" : ""}>${escapeHtml(w.label)}</option>`)
       .join("");
     const grpOpts = state.groups
+      .filter((g) => !isStage1Mode() || g.stage !== 2)
       .map((g) => `<option value="${escapeHtml(g.id)}" ${g.id === "G12" ? "selected" : ""}>${escapeHtml(g.code)} — ${escapeHtml(g.name)}</option>`)
       .join("");
 
@@ -5016,6 +5233,7 @@ window.SOCKETS_DATA = {
 
       const newBlock = {
         id: getNextBlockId(),
+        stage: isStage1Mode() ? 1 : (wall.stage || 1),
         room: wall.room,
         title,
         kind: chosenSockets === 0 && chosenRj45 > 0 ? "rj45" : "socket",
@@ -5375,16 +5593,32 @@ window.SOCKETS_DATA = {
     }
   });
 
+  document.querySelectorAll(".zone-btn[data-zone-mode]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const nextMode = btn.getAttribute("data-zone-mode");
+      if (!nextMode || nextMode === state.zoneMode) return;
+      state.zoneMode = nextMode;
+      if (isStage1Mode() && state.selectedBlockId) {
+        const curSel = getBlockById(state.selectedBlockId);
+        if (!curSel || !isStage1Block(curSel)) state.selectedBlockId = null;
+      }
+      syncZoneButtonsUI();
+      saveToStorage();
+      renderAll();
+    });
+  });
+
   document.getElementById("btn-reset-edits").addEventListener("click", () => {
     if (!confirm("Сбросить все ваши добавления, перестановки, группы и размеры к базовой схеме розеток?")) return;
     pushUndoSnapshot();
     try { localStorage.removeItem(STORAGE_KEY); } catch (e) {}
     state.groups = deepClone(BASELINE_GROUPS);
     state.blocks = deepClone(BASELINE_BLOCKS);
-    state.activeGroups = { G12: true };
+    state.activeGroups = { G12: true, G08: true, G09: true };
     state.selectedBlockId = null;
     state.showDims = true;
     btnToggleDimsEl.classList.add("is-active");
+    syncZoneButtonsUI();
     saveToStorage();
     renderAll();
   });
@@ -5407,6 +5641,7 @@ window.SOCKETS_DATA = {
 
   // Boot
   loadFromStorage();
+  syncZoneButtonsUI();
   btnToggleDimsEl.classList.toggle("is-active", !!state.showDims);
   renderAll();
   updateUndoButtonsUI();
