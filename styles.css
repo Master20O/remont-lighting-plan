@@ -241,6 +241,12 @@ body {
   color: #1d4ed8;
 }
 
+.toolbar-actions button:disabled {
+  opacity: 0.42;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
 .chase-box {
   background: #fffbeb;
   border: 1.5px solid #f59e0b;

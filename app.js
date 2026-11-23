@@ -86,14 +86,97 @@
   const floatingLegendEl = document.getElementById("floating-legend");
   const masterOffBannerEl = document.getElementById("master-off-banner");
   const btnRestoreMasterEl = document.getElementById("btn-restore-master-light");
+  const btnUndoLightEl = document.getElementById("btn-undo-light");
 
   let suppressNextClick = false;
   let sidebarDragPayload = null;
+  const MAX_LIGHTING_HISTORY = 60;
+  const lightingUndoStack = [];
+  const lightingRedoStack = [];
+  let lastSavedLightingSnap = null;
+  let isApplyingLightingUndo = false;
 
-  /* ==================== PERSISTENCE ==================== */
+  /* ==================== PERSISTENCE & UNDO/REDO ==================== */
+
+  function captureLightingSnap() {
+    return JSON.stringify({
+      variant: state.variant,
+      masterLightOn: state.masterLightOn,
+      masterSwitchDeleted: state.masterSwitchDeleted,
+      groups: state.groups,
+      switches: state.switches,
+      fixtureComments: state.fixtureComments
+    });
+  }
+
+  function updateLightingUndoUI() {
+    if (btnUndoLightEl) {
+      btnUndoLightEl.disabled = lightingUndoStack.length === 0;
+    }
+  }
+
+  function applyLightingSnap(snapStr) {
+    try {
+      const parsed = JSON.parse(snapStr);
+      if (!parsed || !Array.isArray(parsed.groups) || !Array.isArray(parsed.switches)) return;
+      const prevSettings = state.groupSettings || {};
+      isApplyingLightingUndo = true;
+      state.variant = parsed.variant === "B" ? "B" : "A";
+      state.masterLightOn = parsed.masterLightOn === false ? false : true;
+      state.masterSwitchDeleted = !!parsed.masterSwitchDeleted;
+      state.groups = parsed.groups;
+      state.switches = parsed.switches;
+      state.fixtureComments = parsed.fixtureComments || {};
+      state.groupSettings = buildInitialGroupSettings(state.groups);
+      Object.keys(state.groupSettings).forEach((gid) => {
+        if (prevSettings[gid]) state.groupSettings[gid] = prevSettings[gid];
+      });
+      if (state.selectedSwitchId && !getSwitchById(state.selectedSwitchId)) {
+        state.selectedSwitchId = null;
+      }
+      if (state.popoverKind === "switch" && state.popoverId && !getSwitchById(state.popoverId)) {
+        state.popoverKind = null;
+        state.popoverId = null;
+      }
+      if (btnVariantA) btnVariantA.classList.toggle("is-active", state.variant === "A");
+      if (btnVariantB) btnVariantB.classList.toggle("is-active", state.variant === "B");
+      lastSavedLightingSnap = snapStr;
+      saveToStorage();
+      renderAll();
+    } catch (err) {
+      // ignore invalid snapshot
+    } finally {
+      isApplyingLightingUndo = false;
+      updateLightingUndoUI();
+    }
+  }
+
+  function undoLightingAction() {
+    if (!lightingUndoStack.length) return;
+    lightingRedoStack.push(captureLightingSnap());
+    const prev = lightingUndoStack.pop();
+    applyLightingSnap(prev);
+  }
+
+  function redoLightingAction() {
+    if (!lightingRedoStack.length) return;
+    lightingUndoStack.push(captureLightingSnap());
+    const next = lightingRedoStack.pop();
+    applyLightingSnap(next);
+  }
 
   function saveToStorage() {
     try {
+      const curSnap = captureLightingSnap();
+      if (!isApplyingLightingUndo && lastSavedLightingSnap && curSnap !== lastSavedLightingSnap) {
+        lightingUndoStack.push(lastSavedLightingSnap);
+        if (lightingUndoStack.length > MAX_LIGHTING_HISTORY) lightingUndoStack.shift();
+        lightingRedoStack.length = 0;
+        lastSavedLightingSnap = curSnap;
+        updateLightingUndoUI();
+      } else if (!lastSavedLightingSnap) {
+        lastSavedLightingSnap = curSnap;
+      }
       const payload = {
         variant: state.variant,
         masterLightOn: state.masterLightOn,
@@ -4918,10 +5001,38 @@
     renderAll();
   });
 
+  if (btnUndoLightEl) {
+    btnUndoLightEl.addEventListener("click", undoLightingAction);
+  }
+
+  window.addEventListener("keydown", (e) => {
+    if (e.target && e.target.matches("input, textarea, select")) return;
+    if ((e.metaKey || e.ctrlKey) && !e.altKey) {
+      const kLow = e.key ? e.key.toLowerCase() : "";
+      const isZ = e.code === "KeyZ" || kLow === "z" || kLow === "я";
+      const isY = !e.metaKey && e.ctrlKey && (e.code === "KeyY" || kLow === "y" || kLow === "н");
+      if (isZ && !e.shiftKey) {
+        if (lightingUndoStack.length) {
+          e.preventDefault();
+          undoLightingAction();
+        }
+      } else if ((isZ && e.shiftKey) || isY) {
+        if (lightingRedoStack.length) {
+          e.preventDefault();
+          redoLightingAction();
+        }
+      }
+    }
+  });
+
   document.getElementById("btn-reset-edits").addEventListener("click", () => {
     if (!confirm("Сбросить все ваши перестановки, типы механизмов, привязки и комментарии к актуальной схеме BM, B1–B25?")) {
       return;
     }
+    const preResetSnap = lastSavedLightingSnap || captureLightingSnap();
+    lightingUndoStack.push(preResetSnap);
+    if (lightingUndoStack.length > MAX_LIGHTING_HISTORY) lightingUndoStack.shift();
+    lightingRedoStack.length = 0;
     try {
       localStorage.removeItem(STORAGE_KEY);
     } catch (e) {}
@@ -4940,6 +5051,8 @@
     if (btnToggleDimsEl) btnToggleDimsEl.classList.remove("is-active");
     if (btnVariantA) btnVariantA.classList.add("is-active");
     if (btnVariantB) btnVariantB.classList.remove("is-active");
+    lastSavedLightingSnap = captureLightingSnap();
+    updateLightingUndoUI();
     renderAll();
   });
 
@@ -4968,6 +5081,8 @@
 
   // Boot
   loadFromStorage();
+  lastSavedLightingSnap = captureLightingSnap();
+  updateLightingUndoUI();
   document.body.classList.toggle("is-demo-mode", state.demoMode);
   if (btnToggleEditorEl) {
     btnToggleEditorEl.textContent = state.demoMode ? "⚙️ Редактор" : "📱 Демо-режим";

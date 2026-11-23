@@ -605,3 +605,31 @@
     border-top: 1px solid var(--border);
   }
 }
+
+.toolbar-actions button:disabled {
+  opacity: 0.42;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.undo-toast {
+  position: absolute;
+  top: 14px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 40;
+  background: rgba(15, 23, 42, 0.92);
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 6px 14px;
+  border-radius: 999px;
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.28);
+  pointer-events: none;
+  transition: opacity 0.18s ease;
+}
+
+.undo-toast.is-hidden {
+  opacity: 0;
+  display: none;
+}

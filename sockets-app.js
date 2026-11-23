@@ -35,7 +35,6 @@
   const viewportEl = document.getElementById("canvas-viewport");
   const stageEl = document.getElementById("plan-stage");
   const wallGuidesEl = document.getElementById("layer-wall-guides");
-  const powerWiresEl = document.getElementById("layer-power-wires");
   const dimsLayerEl = document.getElementById("layer-dims");
   const socketsLayerEl = document.getElementById("layer-sockets");
   const inspectorEl = document.getElementById("selected-inspector");
@@ -48,12 +47,109 @@
   const editsTabCountEl = document.getElementById("edits-tab-count");
   const zoomReadoutEl = document.getElementById("zoom-readout");
   const btnToggleDimsEl = document.getElementById("btn-toggle-dims");
+  const btnUndoEl = document.getElementById("btn-undo");
+  const btnRedoEl = document.getElementById("btn-redo");
+  const undoToastEl = document.getElementById("undo-toast");
   const modalBackdropEl = document.getElementById("modal-backdrop");
   const modalBoxEl = document.getElementById("modal-box");
 
   let suppressNextClick = false;
+  const MAX_HISTORY = 80;
+  const undoStack = [];
+  const redoStack = [];
+  let toastTimer = null;
 
-  /* ==================== PERSISTENCE ==================== */
+  /* ==================== PERSISTENCE & UNDO/REDO ==================== */
+
+  function captureSnapshot() {
+    return JSON.stringify({
+      groups: state.groups,
+      blocks: state.blocks,
+      selectedBlockId: state.selectedBlockId,
+      activeGroups: state.activeGroups
+    });
+  }
+
+  function updateUndoButtonsUI() {
+    if (btnUndoEl) btnUndoEl.disabled = undoStack.length === 0;
+    if (btnRedoEl) btnRedoEl.disabled = redoStack.length === 0;
+  }
+
+  function showUndoToast(text) {
+    if (!undoToastEl) return;
+    undoToastEl.textContent = text;
+    undoToastEl.classList.remove("is-hidden");
+    if (toastTimer) clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => {
+      undoToastEl.classList.add("is-hidden");
+    }, 1300);
+  }
+
+  function pushUndoSnapshot(explicitSnapStr) {
+    const snap = typeof explicitSnapStr === "string" ? explicitSnapStr : captureSnapshot();
+    if (undoStack.length && undoStack[undoStack.length - 1] === snap) return;
+    undoStack.push(snap);
+    if (undoStack.length > MAX_HISTORY) undoStack.shift();
+    redoStack.length = 0;
+    updateUndoButtonsUI();
+  }
+
+  function applySnapshot(snapStr) {
+    try {
+      const parsed = JSON.parse(snapStr);
+      if (!parsed || !Array.isArray(parsed.groups) || !Array.isArray(parsed.blocks)) return;
+      state.groups = parsed.groups;
+      state.blocks = parsed.blocks;
+      state.activeGroups = parsed.activeGroups || { G12: true };
+      const selId = parsed.selectedBlockId || null;
+      state.selectedBlockId = selId && state.blocks.some((b) => b.id === selId) ? selId : null;
+      saveToStorage();
+      renderAll();
+      updateUndoButtonsUI();
+    } catch (e) {}
+  }
+
+  function undoAction() {
+    if (!undoStack.length) return;
+    redoStack.push(captureSnapshot());
+    const prev = undoStack.pop();
+    applySnapshot(prev);
+    showUndoToast("↩ Действие отменено");
+  }
+
+  function redoAction() {
+    if (!redoStack.length) return;
+    undoStack.push(captureSnapshot());
+    const next = redoStack.pop();
+    applySnapshot(next);
+    showUndoToast("↪ Действие возвращено");
+  }
+
+  function bindUndoableInput(el, onLiveInput, onCommitChange) {
+    if (!el) return;
+    let focusSnap = captureSnapshot();
+    let pushed = false;
+    el.addEventListener("focus", () => {
+      focusSnap = captureSnapshot();
+      pushed = false;
+    });
+    el.addEventListener("input", (e) => {
+      if (typeof onLiveInput === "function") onLiveInput(e);
+      if (!pushed && captureSnapshot() !== focusSnap) {
+        pushUndoSnapshot(focusSnap);
+        pushed = true;
+      }
+      saveToStorage();
+    });
+    el.addEventListener("change", (e) => {
+      if (typeof onCommitChange === "function") onCommitChange(e);
+      if (!pushed && captureSnapshot() !== focusSnap) {
+        pushUndoSnapshot(focusSnap);
+        pushed = true;
+      }
+      saveToStorage();
+    });
+  }
 
   function saveToStorage() {
     try {
@@ -313,38 +409,6 @@
       );
     });
 
-    // Power & Cat6 lines from ЩР / Wi-Fi for active groups or selected block
-    powerWiresEl.innerHTML = "";
-    const sel = state.selectedBlockId ? getBlockById(state.selectedBlockId) : null;
-    state.blocks.forEach((b) => {
-      if (b.kind === "shield") return;
-      const isGrpActive = !!state.activeGroups[b.groupId];
-      const isSel = sel && (sel.id === b.id || sel.groupId === b.groupId);
-      if (!isGrpActive && !isSel) return;
-      const grp = getGroupById(b.groupId);
-      const col = grp ? grp.color : "#2563eb";
-      const ax = b.kind === "rj45" && !b.sockets ? DATA.wifiAnchor.x : DATA.shieldAnchor.x;
-      const ay = b.kind === "rj45" && !b.sockets ? DATA.wifiAnchor.y : DATA.shieldAnchor.y;
-      powerWiresEl.appendChild(
-        createSvgEl("line", {
-          x1: ax, y1: ay, x2: b.x, y2: b.y,
-          stroke: b.kind === "rj45" && !b.sockets ? "#16a34a" : col,
-          "stroke-width": sel && sel.id === b.id ? 4.2 : 2.6,
-          "stroke-opacity": sel && sel.id === b.id ? 0.85 : 0.45,
-          "stroke-dasharray": "10 7",
-          "stroke-linecap": "round"
-        })
-      );
-      if (b.sockets > 0 && b.rj45 > 0) {
-        powerWiresEl.appendChild(
-          createSvgEl("line", {
-            x1: DATA.wifiAnchor.x, y1: DATA.wifiAnchor.y, x2: b.x, y2: b.y,
-            stroke: "#16a34a", "stroke-width": 2.8, "stroke-opacity": 0.65, "stroke-dasharray": "5 5"
-          })
-        );
-      }
-    });
-
     // Wall offset dimension lines (show for selected/hovered block, plus compact h-labels if showDims is true)
     dimsLayerEl.innerHTML = "";
     const focusId = state.hoveredBlockId || state.selectedBlockId;
@@ -601,14 +665,22 @@
       </div>
     `;
 
-    // Bind inspector handlers cleanly
-    document.getElementById("ins-title").addEventListener("change", (e) => {
-      b.title = e.target.value.trim() || b.title;
-      saveToStorage();
-      renderSidebarTab();
-      renderStatsAndBadges();
-    });
+    // Bind inspector handlers cleanly with Undo history
+    bindUndoableInput(
+      document.getElementById("ins-title"),
+      (e) => {
+        b.title = e.target.value;
+        renderSidebarTab();
+        renderStatsAndBadges();
+      },
+      (e) => {
+        b.title = e.target.value.trim() || b.title;
+        renderSidebarTab();
+        renderStatsAndBadges();
+      }
+    );
     document.getElementById("ins-del-btn").addEventListener("click", () => {
+      pushUndoSnapshot();
       state.blocks = state.blocks.filter((x) => x.id !== b.id);
       state.selectedBlockId = null;
       saveToStorage();
@@ -619,6 +691,7 @@
     });
     inspectorEl.querySelectorAll("[data-set-sockets]").forEach((btn) => {
       btn.addEventListener("click", () => {
+        pushUndoSnapshot();
         const cnt = Number(btn.getAttribute("data-set-sockets"));
         b.sockets = cnt;
         if (cnt > 0) b.kind = "socket";
@@ -633,6 +706,7 @@
     });
     inspectorEl.querySelectorAll("[data-set-rj45]").forEach((btn) => {
       btn.addEventListener("click", () => {
+        pushUndoSnapshot();
         const rj = Number(btn.getAttribute("data-set-rj45"));
         b.rj45 = rj;
         if (b.sockets === 0 && rj > 0) b.kind = "rj45";
@@ -645,12 +719,14 @@
       });
     });
     document.getElementById("ins-toggle-ip44").addEventListener("click", () => {
+      pushUndoSnapshot();
       b.ip44 = !b.ip44;
       saveToStorage();
       renderAll();
     });
     inspectorEl.querySelectorAll("[data-set-kind]").forEach((btn) => {
       btn.addEventListener("click", () => {
+        pushUndoSnapshot();
         const kd = btn.getAttribute("data-set-kind");
         b.kind = kd;
         if (kd === "socket" && b.sockets === 0) b.sockets = 1;
@@ -664,23 +740,26 @@
     });
 
     const hInput = document.getElementById("ins-height-mm");
-    hInput.addEventListener("input", () => {
-      const val = parseInt(hInput.value, 10);
-      if (!Number.isNaN(val)) {
-        b.heightMm = Math.max(0, Math.min(3200, val));
-        renderPlanOverlays();
-        renderSocketMarkers();
-        renderSidebarTab();
-        renderStatsAndBadges();
+    bindUndoableInput(
+      hInput,
+      () => {
+        const val = parseInt(hInput.value, 10);
+        if (!Number.isNaN(val)) {
+          b.heightMm = Math.max(0, Math.min(3200, val));
+          renderPlanOverlays();
+          renderSocketMarkers();
+          renderSidebarTab();
+          renderStatsAndBadges();
+        }
+      },
+      () => {
+        b.heightMm = Math.max(0, Math.min(3200, Math.round(Number(hInput.value) || 0)));
+        renderAll();
       }
-    });
-    hInput.addEventListener("change", () => {
-      b.heightMm = Math.max(0, Math.min(3200, Math.round(Number(hInput.value) || 0)));
-      saveToStorage();
-      renderAll();
-    });
+    );
     inspectorEl.querySelectorAll("[data-h-step]").forEach((btn) => {
       btn.addEventListener("click", () => {
+        pushUndoSnapshot();
         b.heightMm = Math.max(0, Math.min(3200, (Number(b.heightMm) || 0) + Number(btn.getAttribute("data-h-step"))));
         saveToStorage();
         renderAll();
@@ -688,6 +767,7 @@
     });
     inspectorEl.querySelectorAll("[data-h-preset]").forEach((btn) => {
       btn.addEventListener("click", () => {
+        pushUndoSnapshot();
         b.heightMm = Number(btn.getAttribute("data-h-preset"));
         saveToStorage();
         renderAll();
@@ -695,6 +775,7 @@
     });
 
     document.getElementById("ins-wall-select").addEventListener("change", (e) => {
+      pushUndoSnapshot();
       const wid = e.target.value;
       if (!wid) {
         b.wallId = "";
@@ -715,6 +796,7 @@
         btn.addEventListener("click", () => {
           const newSide = btn.getAttribute("data-ref-side");
           if (newSide !== b.refSide) {
+            pushUndoSnapshot();
             b.refSide = newSide;
             b.offsetMm = Math.max(0, wall.lengthMm - (Number(b.offsetMm) || 0));
             saveToStorage();
@@ -723,23 +805,26 @@
         });
       });
       const offInput = document.getElementById("ins-offset-mm");
-      offInput.addEventListener("input", () => {
-        const val = parseInt(offInput.value, 10);
-        if (!Number.isNaN(val)) {
-          moveBlockToWallOffset(b, wall, b.refSide || "left", val);
-          renderPlanOverlays();
-          renderSocketMarkers();
-          renderSidebarTab();
-          renderStatsAndBadges();
+      bindUndoableInput(
+        offInput,
+        () => {
+          const val = parseInt(offInput.value, 10);
+          if (!Number.isNaN(val)) {
+            moveBlockToWallOffset(b, wall, b.refSide || "left", val);
+            renderPlanOverlays();
+            renderSocketMarkers();
+            renderSidebarTab();
+            renderStatsAndBadges();
+          }
+        },
+        () => {
+          moveBlockToWallOffset(b, wall, b.refSide || "left", Number(offInput.value));
+          renderAll();
         }
-      });
-      offInput.addEventListener("change", () => {
-        moveBlockToWallOffset(b, wall, b.refSide || "left", Number(offInput.value));
-        saveToStorage();
-        renderAll();
-      });
+      );
       inspectorEl.querySelectorAll("[data-off-step]").forEach((btn) => {
         btn.addEventListener("click", () => {
+          pushUndoSnapshot();
           moveBlockToWallOffset(b, wall, b.refSide || "left", (Number(b.offsetMm) || 0) + Number(btn.getAttribute("data-off-step")));
           saveToStorage();
           renderAll();
@@ -748,12 +833,14 @@
     }
 
     document.getElementById("ins-pencil-chk").addEventListener("change", (e) => {
+      pushUndoSnapshot();
       b.byPencil = !!e.target.checked;
       saveToStorage();
       renderSidebarTab();
       renderStatsAndBadges();
     });
     document.getElementById("ins-group-select").addEventListener("change", (e) => {
+      pushUndoSnapshot();
       b.groupId = e.target.value;
       state.activeGroups[b.groupId] = true;
       saveToStorage();
@@ -762,24 +849,32 @@
     document.getElementById("ins-new-grp-btn").addEventListener("click", () => {
       openAddGroupModal(b.id);
     });
-    document.getElementById("ins-watts").addEventListener("input", (e) => {
-      const val = parseInt(e.target.value, 10);
-      if (!Number.isNaN(val)) {
-        b.watts = Math.max(0, val);
-        renderSidebarTab();
+    bindUndoableInput(
+      document.getElementById("ins-watts"),
+      (e) => {
+        const val = parseInt(e.target.value, 10);
+        if (!Number.isNaN(val)) {
+          b.watts = Math.max(0, val);
+          renderSidebarTab();
+          renderStatsAndBadges();
+        }
+      },
+      (e) => {
+        b.watts = Math.max(0, Math.round(Number(e.target.value) || 0));
+        renderAll();
+      }
+    );
+    bindUndoableInput(
+      document.getElementById("ins-comment"),
+      (e) => {
+        b.comment = e.target.value;
+        renderStatsAndBadges();
+      },
+      (e) => {
+        b.comment = e.target.value;
         renderStatsAndBadges();
       }
-    });
-    document.getElementById("ins-watts").addEventListener("change", (e) => {
-      b.watts = Math.max(0, Math.round(Number(e.target.value) || 0));
-      saveToStorage();
-      renderAll();
-    });
-    document.getElementById("ins-comment").addEventListener("change", (e) => {
-      b.comment = e.target.value;
-      saveToStorage();
-      renderStatsAndBadges();
-    });
+    );
   }
 
   function renderSidebarTab() {
@@ -829,6 +924,7 @@
       tabContentEl.querySelectorAll("[data-quick-del]").forEach((btn) => {
         btn.addEventListener("click", (e) => {
           e.stopPropagation();
+          pushUndoSnapshot();
           const id = btn.getAttribute("data-quick-del");
           state.blocks = state.blocks.filter((x) => x.id !== id);
           if (state.selectedBlockId === id) state.selectedBlockId = null;
@@ -841,7 +937,7 @@
 
     if (state.activeTab === "groups") {
       const topBtn = `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-        <span style="font-size:11.5px;color:#475569;font-weight:700;">Нажмите на группу, чтобы подсветить её розетки и кабель от ЩР:</span>
+        <span style="font-size:11.5px;color:#475569;font-weight:700;">Нажмите на группу, чтобы подсветить её розетки на плане:</span>
         <button type="button" class="btn-primary" id="btn-tab-add-grp" style="padding:4px 8px;font-size:11px;">+ Группа</button>
       </div>`;
       const cardsHtml = state.groups
@@ -913,6 +1009,7 @@
   }
 
   function duplicateBlock(src) {
+    pushUndoSnapshot();
     const wall = src.wallId ? wallById.get(src.wallId) : null;
     const copy = deepClone(src);
     copy.id = getNextBlockId();
@@ -1036,6 +1133,7 @@
         y: wall.y1,
         comment: ""
       };
+      pushUndoSnapshot();
       moveBlockToWallOffset(newBlock, wall, refSide, offMm);
       state.blocks.push(newBlock);
       state.activeGroups[gid] = true;
@@ -1086,6 +1184,7 @@
         color: palette[state.groups.length % palette.length],
         nonMaster: true
       };
+      pushUndoSnapshot();
       state.groups.push(newGrp);
       state.activeGroups[newGrp.id] = true;
       if (assignToBlockId) {
@@ -1144,6 +1243,7 @@
       const downY = e.clientY;
       const origX = b.x;
       const origY = b.y;
+      const preDragSnap = captureSnapshot();
       const thresh = e.pointerType === "touch" ? 12 : 5;
       let isDragging = false;
 
@@ -1191,6 +1291,7 @@
         window.removeEventListener("pointercancel", onUp);
         el.classList.remove("is-dragging");
         if (isDragging) {
+          pushUndoSnapshot(preDragSnap);
           suppressNextClick = true;
           setTimeout(() => { suppressNextClick = false; }, 60);
           saveToStorage();
@@ -1343,8 +1444,40 @@
     renderAll();
   });
 
+  if (btnUndoEl) btnUndoEl.addEventListener("click", undoAction);
+  if (btnRedoEl) btnRedoEl.addEventListener("click", redoAction);
+
+  window.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && !modalBackdropEl.classList.contains("is-hidden")) {
+      closeModal();
+      return;
+    }
+    if (!modalBackdropEl.classList.contains("is-hidden") && e.target && e.target.matches("input, textarea, select")) {
+      return;
+    }
+    if ((e.metaKey || e.ctrlKey) && !e.altKey) {
+      const kLow = e.key ? e.key.toLowerCase() : "";
+      const isZ = e.code === "KeyZ" || kLow === "z" || kLow === "я";
+      const isY = !e.metaKey && e.ctrlKey && (e.code === "KeyY" || kLow === "y" || kLow === "н");
+      if (isZ && !e.shiftKey) {
+        e.preventDefault();
+        if (document.activeElement && document.activeElement.matches("#selected-inspector input")) {
+          document.activeElement.blur();
+        }
+        undoAction();
+      } else if ((isZ && e.shiftKey) || isY) {
+        e.preventDefault();
+        if (document.activeElement && document.activeElement.matches("#selected-inspector input")) {
+          document.activeElement.blur();
+        }
+        redoAction();
+      }
+    }
+  });
+
   document.getElementById("btn-reset-edits").addEventListener("click", () => {
     if (!confirm("Сбросить все ваши добавления, перестановки, группы и размеры к базовой схеме розеток?")) return;
+    pushUndoSnapshot();
     try { localStorage.removeItem(STORAGE_KEY); } catch (e) {}
     state.groups = deepClone(BASELINE_GROUPS);
     state.blocks = deepClone(BASELINE_BLOCKS);
@@ -1352,6 +1485,7 @@
     state.selectedBlockId = null;
     state.showDims = true;
     btnToggleDimsEl.classList.add("is-active");
+    saveToStorage();
     renderAll();
   });
 
@@ -1375,6 +1509,7 @@
   loadFromStorage();
   btnToggleDimsEl.classList.toggle("is-active", !!state.showDims);
   renderAll();
+  updateUndoButtonsUI();
   requestAnimationFrame(fitPlanToViewport);
   window.addEventListener("load", fitPlanToViewport, { once: true });
   setTimeout(fitPlanToViewport, 80);
