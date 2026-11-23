@@ -265,7 +265,8 @@
     <div class="toolbar-left">
       <div class="toolbar-title">📐 Монтажный комплект электрика (клавиши 1–27 + М)</div>
       <nav class="nav-links">
-        <a href="#sec-plan">План</a>
+        <a href="#sec-plan">План света</a>
+        <a href="#sec-sockets">Розетки и щит</a>
         <a href="#sec-switches">Выключатели (23)</a>
         <a href="#sec-fixtures">Точки (39)</a>
         <a href="#sec-groups">Линии 1–27 + М (28)</a>
@@ -273,14 +274,16 @@
       </nav>
     </div>
     <div class="toolbar-actions">
-      <a class="btn btn-back" href="assets/electrician_smartphone.html?v=8" download="Интерактивная_схема_для_смартфона.html">📱 Скачать на смартфон</a>
-      <a class="btn btn-file" href="assets/electrician_album_final.pdf?v=8" target="_blank">📄 Альбом PDF</a>
-      <a class="btn btn-file" href="assets/electrician_plan_final.png?v=8" target="_blank">🖼️ Чертёж PNG</a>
-      <a class="btn btn-file" href="assets/electrician_tables_final.xlsx?v=8" download>📊 Excel</a>
-      <a class="btn btn-file" href="assets/electrician_points_final.csv?v=8" download>📋 CSV точки</a>
-      <a class="btn btn-file" href="assets/electrician_spec_final.md?v=8" target="_blank">📝 ТЗ (MD)</a>
+      <a class="btn btn-back" href="assets/electrician_smartphone.html?v=9" download="Интерактивная_схема_для_смартфона.html">📱 Скачать на смартфон</a>
+      <a class="btn btn-file" href="assets/electrician_album_final.pdf?v=9" target="_blank">📄 Альбом PDF</a>
+      <a class="btn btn-file" href="assets/electrician_plan_final.png?v=9" target="_blank">🖼️ Чертёж PNG</a>
+      <a class="btn btn-file" href="assets/electrician_sockets_final.png?v=9" target="_blank">🔌 План розеток PNG</a>
+      <a class="btn btn-file" href="assets/electrician_tables_final.xlsx?v=9" download>📊 Excel</a>
+      <a class="btn btn-file" href="assets/electrician_points_final.csv?v=9" download>📋 CSV точки</a>
+      <a class="btn btn-file" href="assets/electrician_sockets_final.csv?v=9" download>🔌 CSV щит</a>
+      <a class="btn btn-file" href="assets/electrician_spec_final.md?v=9" target="_blank">📝 ТЗ (MD)</a>
       <button type="button" class="btn btn-print" onclick="window.print()">🖨️ Печать / PDF</button>
-      <a class="btn btn-back" href="index.html?v=8">← Симулятор</a>
+      <a class="btn btn-back" href="index.html?v=9">← Симулятор</a>
     </div>
   </header>
 
@@ -293,11 +296,50 @@
           <h2>СВОДНЫЙ ПЛАН ОСВЕЩЕНИЯ, ВЕНТИЛЯЦИИ И ВЫКЛЮЧАТЕЛЕЙ (ЕДИНЫЕ НОМЕРА 1–27 + М)</h2>
           <p>Номер на клавише выключателя совпадает с номером светильника на плане (группы 1–27 + мастер М)</p>
         </div>
-        <span class="sheet-badge">Лист 1 / 5</span>
+        <span class="sheet-badge">Лист 1 / 6</span>
       </div>
       <div class="plan-wrap">
-        <img src="assets/electrician_plan_final.png?v=8" alt="Итоговый чертёж освещения для электрика">
+        <img src="assets/electrician_plan_final.png?v=9" alt="Итоговый чертёж освещения для электрика">
       </div>
+    </section>
+
+    <section id="sec-sockets" class="sheet">
+      <div class="sheet-head">
+        <div>
+          <h2>ПЛАН РОЗЕТОК, СИЛОВЫХ ВЫВОДОВ, СЛАБОТОЧКИ И ЭЛЕКТРОЩИТА ЩР</h2>
+          <p>Кухня: вся основная техника справа, холодильник слева · Бытовые розетки h=300 и ТП h=900 — по карандашной разметке на стенах · Все розетки ДО контактора М</p>
+        </div>
+        <span class="sheet-badge">Лист 2 / 6</span>
+      </div>
+      <div class="plan-wrap" style="margin-bottom: 14px;">
+        <img src="assets/electrician_sockets_final.png?v=9" alt="Итоговый план розеток, силовых выводов и щита ЩР">
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Линия ЩР</th>
+            <th>Автомат / УЗО</th>
+            <th>Кабель</th>
+            <th>Потребители и правило подключения к мастер-выключателю М</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td><b>Ввод</b></td><td>Вводной + РН + УЗО А</td><td>Вводной</td><td>Реле напряжения (защита 190–253 В) + групповые УЗО тип А (30 мА)</td></tr>
+          <tr class="row-master"><td><b>Гр. 01</b></td><td>B10 (×3) + Контактор</td><td>3×1,5 / 5×1,5</td><td><b>ВСЕ 27 линий света (1–20, 22–27)</b> — ЕДИНСТВЕННЫЕ линии ПОСЛЕ контактора М</td></tr>
+          <tr><td><b>Гр. 02</b></td><td>C32 + дифавтомат</td><td>ВВГ 3×6,0</td><td>Варочная панель / плита на кухне у входа справа (h=300) — ДО контактора М</td></tr>
+          <tr><td><b>Гр. 03</b></td><td>C16 (УЗО А 30 мА)</td><td>ВВГ 3×2,5</td><td>Духовой шкаф справа на кухне (h=300) — ДО контактора М</td></tr>
+          <tr><td><b>Гр. 04</b></td><td>C16 (УЗО А 30 мА)</td><td>ВВГ 3×2,5</td><td>Стиральная машина справа на кухне (розетка сбоку в тумбе, h=400) — ДО М</td></tr>
+          <tr><td><b>Гр. 05</b></td><td>C16 (УЗО А 30 мА)</td><td>ВВГ 3×2,5</td><td>Сушильная машина справа на кухне (отд. линия рядом со стиралкой, h=400) — ДО М</td></tr>
+          <tr><td><b>Гр. 06</b></td><td>C16 (УЗО А 30 мА)</td><td>ВВГ 3×2,5</td><td>ПММ + фильтр/измельчитель под мойкой справа (сбоку от ПММ, h=450) — ДО М</td></tr>
+          <tr><td><b>Гр. 07</b></td><td>C16 (УЗО А 30 мА)</td><td>ВВГ 3×2,5</td><td>Рабочие розетки фартука кухни справа (2×3=6 шт., h=1050: чайник, СВЧ, кофе) — ДО М</td></tr>
+          <tr class="row-vent"><td><b>Гр. 08</b></td><td>C16 (неоткл.)</td><td>2×(ВВГ 3×2,5)</td><td><b>НЕОТКЛЮЧАЕМЫЕ ДО М:</b> холодильник слева (h=300) + вытяжка (h=2150) + роутер (h=2150)</td></tr>
+          <tr><td><b>Гр. 09</b></td><td>C16 (УЗО А 30 мА)</td><td>ВВГ 3×2,5</td><td>Кондиционер над дверью спальни в сторону зала (h=2450) — отд. линия ДО М</td></tr>
+          <tr><td><b>Гр. 10</b></td><td>C16 (УЗО А 30 мА)</td><td>ВВГ 3×2,5</td><td>Тёплые полы: подвод к терморегуляторам (h=900) прихожей, с/у и балкона — ДО М</td></tr>
+          <tr><td><b>Гр. 11</b></td><td>C16 + B10 (УЗО 10 мА)</td><td>3×2,5 + 4×1,5</td><td>Санузел IP44+: раковина (h=950), полотенцесуш. (h=800), протечки/бойлер + вент. 21 — ДО М</td></tr>
+          <tr><td><b>Гр. 12</b></td><td>C16 (УЗО А 30 мА)</td><td>ВВГ 3×2,5</td><td>Розетки Зала + ТВ-зона (4+2 шт. + RJ-45) + стол/ПК (3 шт. + RJ-45) + балкон IP44+ — по каранд.</td></tr>
+          <tr><td><b>Гр. 13</b></td><td>C16 (УЗО А 30 мА)</td><td>ВВГ 3×2,5</td><td>Розетки Спальни (тумбы 1 и 2 h=300, левая стена) + Прихожая + Кладовая (робот) + кормушка — ДО М</td></tr>
+        </tbody>
+      </table>
     </section>
 
     <section id="sec-switches" class="sheet">
@@ -306,7 +348,7 @@
           <h2>ВЕДОМОСТЬ ВЫКЛЮЧАТЕЛЕЙ, РЕГУЛЯТОРОВ И МНОГОПОСТОВЫХ РАМОК (23 ПОСТА · 1–27 + М)</h2>
           <p>Раскладка по помещениям, блокам, номерам клавиш/светильников и проверке открывания дверей</p>
         </div>
-        <span class="sheet-badge">Лист 2 / 5</span>
+        <span class="sheet-badge">Лист 3 / 6</span>
       </div>
       <table>
         <thead>
@@ -330,7 +372,7 @@
           <h2>ВЕДОМОСТЬ ТОЧЕК ОСВЕЩЕНИЯ И ВЕНТИЛЯЦИИ (ЕДИНЫЕ НОМЕРА 1–27 · 39 ТОЧЕК)</h2>
           <p>Номер на плане совпадает с номером клавиши; точка 21 — вытяжной вентилятор санузла (мимо М)</p>
         </div>
-        <span class="sheet-badge">Лист 3 / 5</span>
+        <span class="sheet-badge">Лист 4 / 6</span>
       </div>
       <table>
         <thead>
@@ -354,7 +396,7 @@
           <h2>ВЕДОМОСТЬ ЛИНИЙ И КАНАЛОВ 1–27 + МАСТЕР М (28 ЛИНИЙ)</h2>
           <p>Свет 1–20, 22–27 под контактором М · вентилятор 21 и все розетки питаются ДО контактора М</p>
         </div>
-        <span class="sheet-badge">Лист 4 / 5</span>
+        <span class="sheet-badge">Лист 5 / 6</span>
       </div>
       <table>
         <thead>
@@ -378,7 +420,7 @@
           <h2>ТРЕБОВАНИЯ К СБОРКЕ ЭЛЕКТРОЩИТА, ВЕНТИЛЯЦИИ И МОНТАЖНЫМ ОТСТУПАМ</h2>
           <p>Итоговая памятка перед черновыми работами и штроблением</p>
         </div>
-        <span class="sheet-badge">Лист 5 / 5</span>
+        <span class="sheet-badge">Лист 6 / 6</span>
       </div>
       <div class="cards-grid">
         <div class="card is-red">
@@ -429,7 +471,7 @@
     </section>
   </main>
 
-  <script src="data.js?v=8"></script>
+  <script src="data.js?v=9"></script>
   <script>
     (function () {
       const D = window.LIGHTING_DATA;
