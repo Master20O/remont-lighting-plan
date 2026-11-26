@@ -8,7 +8,7 @@
   }
 
   const SVG_NS = "http://www.w3.org/2000/svg";
-  const STORAGE_KEY = "sockets_editor_v15_stage1_24";
+  const STORAGE_KEY = "sockets_editor_v17_stage1_final";
 
   function deepClone(obj) {
     return JSON.parse(JSON.stringify(obj));
@@ -408,7 +408,7 @@
       lines.push("", "**Изменения относительно базового плана:**");
       diffs.forEach((d) => lines.push(`- ${d}`));
     } else {
-      lines.push("", "_Изменений относительно базовой схемы розеток v=15 пока нет._");
+      lines.push("", "_Изменений относительно утверждённой схемы розеток v=17 пока нет._");
     }
     if (isStage1Mode()) {
       const s1Blocks = state.blocks.filter((b) => isStage1Block(b) && b.kind !== "shield");
@@ -1115,7 +1115,7 @@
     const diffs = computeEditsSummary();
     tabContentEl.innerHTML = diffs.length
       ? diffs.map((d) => `<div class="block-item" style="font-size:11.5px;">• ${escapeHtml(d)}</div>`).join("")
-      : `<div class="inspector-empty">Изменений относительно базовой схемы v=15 (24 розетки Этапа 1) пока нет. Любая перестановка, отделение розетки, смена группы или высоты/отступа появится здесь.</div>`;
+      : `<div class="inspector-empty">Изменений относительно утверждённой схемы v=17 (24 розетки Этапа 1) пока нет. Любая перестановка, отделение розетки, смена группы или высоты/отступа появится здесь.</div>`;
   }
 
   function renderAll() {

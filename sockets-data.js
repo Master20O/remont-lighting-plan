@@ -58,7 +58,7 @@ window.SOCKETS_DATA = {
   shieldAnchor: { x: 1775, y: 1511 },
   wifiAnchor: { x: 1832, y: 1511 },
   groups: [
-    { id: "G12", stage: 1, code: "Гр. 12", name: "Правая половина зала (23 роз. + RJ-45, 2 570 Вт)", breaker: "C16 (УЗО А 30 мА)", maxWatts: 3680, cable: "ВВГ 3×2,5", color: "#2563eb", nonMaster: true },
+    { id: "G12", stage: 1, code: "Гр. 12", name: "Правая половина зала (23 роз. + RJ-45, 2 505 Вт)", breaker: "C16 (УЗО А 30 мА)", maxWatts: 3680, cable: "ВВГ 3×2,5", color: "#2563eb", nonMaster: true },
     { id: "G08", stage: 1, code: "Гр. 08", name: "НЕОТКЛЮЧАЕМЫЕ: Wi-Fi роутер (+ Холодильник/Вытяжка)", breaker: "C16 (неоткл.)", maxWatts: 3680, cable: "ВВГ 3×2,5", color: "#0284c7", nonMaster: true },
     { id: "G09", stage: 1, code: "Гр. 09", name: "Кондиционер (вывод 3×2,5 без розетки)", breaker: "C16 (УЗО А 30 мА)", maxWatts: 3680, cable: "ВВГ 3×2,5", color: "#0ea5e9", nonMaster: true },
 
@@ -74,66 +74,61 @@ window.SOCKETS_DATA = {
     { id: "G14", stage: 2, code: "Гр. 14", name: "Спальня (тумбы h=600) + Прихожая (резерв) + Кладовая + кормушка", breaker: "C16 (УЗО А 30 мА)", maxWatts: 3680, cable: "ВВГ 3×2,5", color: "#db2777", nonMaster: true }
   ],
   blocks: [
-    // --- ЭТАП 1: ПРАВАЯ ПОЛОВИНА ЗАЛА + ПРИХОЖАЯ (строго 24 розетки 230В под 24 устройства + 1 RJ-45 + вывод конд. + ЩР) ---
+    // --- ЭТАП 1: ПРАВАЯ ПОЛОВИНА ЗАЛА + ПРИХОЖАЯ (строго 24 розетки 230В + 1 RJ-45 + вывод конд. + ЩР, финал) ---
     {
       id: "R1", stage: 1, room: "Зал (правая пол.)", title: "Видеосвет 3 (200 Вт) + Селфи-лампа (30 Вт)",
       kind: "socket", sockets: 2, rj45: 0, ip44: false, watts: 230, groupId: "G12",
       wallId: "liv_top_r", x: 1095, y: 455, refSide: "left", offsetMm: 410, heightMm: 300, byPencil: true, comment: "25) Видеосвет 200 Вт + 26) Селфи-лампа 30 Вт"
     },
     {
-      id: "R2", stage: 1, room: "Зал (правая пол.)", title: "Шторы (электрокарниз за гардиной)",
-      kind: "socket", sockets: 1, rj45: 0, ip44: false, watts: 65, groupId: "G12",
-      wallId: "liv_top_r", x: 1355, y: 455, refSide: "right", offsetMm: 1270, heightMm: 2600, byPencil: false, comment: "55) Электрокарниз штор у потолка за гардиной"
-    },
-    {
       id: "R3", stage: 1, room: "Зал (правая пол.)", title: "Гирлянды + Колонка бол. 1 + Видеосвет 1",
-      kind: "socket", sockets: 3, rj45: 0, ip44: false, watts: 530, groupId: "G12",
-      wallId: "liv_top_r", x: 1495, y: 455, refSide: "right", offsetMm: 440, heightMm: 300, byPencil: true, comment: "32) Гирлянды (30 Вт) + 12) Колонка 1 (250 Вт) + 23) Видеосвет 1 (250 Вт)"
+      kind: "socket", sockets: 4, rj45: 0, ip44: false, watts: 530, groupId: "G12",
+      wallId: "liv_bot", x: 988, y: 1311, refSide: "right", offsetMm: 4156, heightMm: 300, byPencil: true, comment: "32) Гирлянды + 12) Колонка 1 + 23) Видеосвет 1 (4-пост. блок)"
     },
     {
       id: "R4", stage: 1, room: "Зал (правая пол.)", title: "Телевизор (за экраном)",
       kind: "socket", sockets: 1, rj45: 0, ip44: false, watts: 200, groupId: "G12",
-      wallId: "liv_right", x: 1570, y: 625, refSide: "left", offsetMm: 960, heightMm: 1300, byPencil: false, comment: "10) Телевизор 200 Вт"
+      wallId: "liv_top_r", x: 1350, y: 455, refSide: "left", offsetMm: 1918, heightMm: 2600, byPencil: false, comment: "10) Телевизор 200 Вт (h=2600, одна вертикаль с R10)"
     },
     {
       id: "R5", stage: 1, room: "Зал (правая пол.)", title: "Макбук 1 + 2 Айфона + Колонка мал. 1",
       kind: "socket", sockets: 4, rj45: 0, ip44: false, watts: 190, groupId: "G12",
-      wallId: "liv_pier", x: 1026, y: 655, refSide: "left", offsetMm: 1110, heightMm: 300, byPencil: true, comment: "2) Макбук (90 Вт) + 4,5) 2 Айфона (40 Вт) + 14) Колонка мал. 1 (60 Вт)"
+      wallId: "", x: 1003, y: 755, refSide: "left", offsetMm: 0, heightMm: 300, byPencil: true, comment: "2) Макбук (90 Вт) + 4,5) 2 Айфона (40 Вт) + 14) Колонка мал. 1 (60 Вт)"
     },
     {
-      id: "R6", stage: 1, room: "Зал (правая пол.)", title: "PS5 интернет RJ-45 (от роутера Cat 6)",
+      id: "R6", stage: 1, room: "Прихожая", title: "PS5 интернет RJ-45 (от роутера Cat 6)",
       kind: "rj45", sockets: 0, rj45: 1, ip44: false, watts: 0, groupId: "G12",
-      wallId: "liv_right", x: 1570, y: 710, refSide: "left", offsetMm: 1440, heightMm: 300, byPencil: false, comment: "9) Интернет-кабель Cat 6 к PlayStation от Wi-Fi роутера"
+      wallId: "hall_left", x: 1750, y: 1486, refSide: "left", offsetMm: 138, heightMm: 300, byPencil: false, comment: "9) Интернет-кабель Cat 6 от Wi-Fi роутера (левая стена прихожей)"
     },
     {
       id: "R7", stage: 1, room: "Зал (правая пол.)", title: "PlayStation + Караоке + ЗУ камеры + ЗУ микр.",
       kind: "socket", sockets: 4, rj45: 0, ip44: false, watts: 430, groupId: "G12",
-      wallId: "liv_right", x: 1570, y: 795, refSide: "left", offsetMm: 1920, heightMm: 300, byPencil: true, comment: "9) PS5 (350 Вт) + 31) Микр. (30 Вт) + 35) ЗУ кам. (30 Вт) + 36) ЗУ микр. (20 Вт)"
+      wallId: "liv_top_r", x: 1262, y: 455, refSide: "left", offsetMm: 1397, heightMm: 300, byPencil: true, comment: "9) PS5 (350 Вт) + 31) Микр. (30 Вт) + 35) ЗУ кам. (30 Вт) + 36) ЗУ микр. (20 Вт)"
     },
     {
       id: "R8", stage: 1, room: "Зал (правая пол.)", title: "Колонка бол. 2 + Видеосвет 2",
       kind: "socket", sockets: 2, rj45: 0, ip44: false, watts: 500, groupId: "G12",
-      wallId: "liv_right", x: 1570, y: 915, refSide: "right", offsetMm: 400, heightMm: 300, byPencil: true, comment: "13) Колонка большая 2 (250 Вт) + 24) Видеосвет 2 (250 Вт)"
+      wallId: "liv_kitch_pier", x: 1594, y: 1030, refSide: "right", offsetMm: 404, heightMm: 300, byPencil: true, comment: "13) Колонка большая 2 (250 Вт) + 24) Видеосвет 2 (250 Вт)"
     },
     {
       id: "R9", stage: 1, room: "Зал (правая пол.)", title: "Проектор + Колонка мал. 2",
       kind: "socket", sockets: 2, rj45: 0, ip44: false, watts: 260, groupId: "G12",
-      wallId: "liv_bot", x: 1115, y: 1311, refSide: "left", offsetMm: 860, heightMm: 300, byPencil: true, comment: "1) Проектор (200 Вт) + 15) Колонка мал. 2 (60 Вт)"
+      wallId: "", x: 920, y: 1351, refSide: "left", offsetMm: 0, heightMm: 300, byPencil: true, comment: "1) Проектор (200 Вт) + 15) Колонка мал. 2 (60 Вт)"
     },
     {
       id: "R10", stage: 1, room: "Зал (правая пол.)", title: "Макбук 2 + 2 Айфона + Андроид",
       kind: "socket", sockets: 4, rj45: 0, ip44: false, watts: 165, groupId: "G12",
-      wallId: "liv_bot", x: 1405, y: 1311, refSide: "right", offsetMm: 1880, heightMm: 300, byPencil: true, comment: "3) Макбук (90 Вт) + 6,7) 2 Айфона (40 Вт) + 8) Андроид (35 Вт)"
+      wallId: "", x: 1351, y: 390, refSide: "left", offsetMm: 0, heightMm: 2000, byPencil: true, comment: "3) Макбук (90 Вт) + 6,7) 2 Айфона (40 Вт) + 8) Андроид (35 Вт)"
     },
     {
       id: "R13", stage: 1, room: "Зал (правая пол.)", title: "ВЫВОД КОНДИЦИОНЕРА (без розетки)",
       kind: "cable", sockets: 0, rj45: 0, ip44: false, watts: 1400, groupId: "G09",
-      wallId: "ac_door", x: 865, y: 1580, refSide: "left", offsetMm: 510, heightMm: 2450, byPencil: false, comment: "38) Прямой вывод 3×2,5 БЕЗ розетки над дверью спальни (дует в зал)"
+      wallId: "ac_door", x: 864, y: 1580, refSide: "left", offsetMm: 510, heightMm: 2450, byPencil: false, comment: "38) Прямой вывод 3×2,5 БЕЗ розетки над дверью спальни (дует в зал)"
     },
     {
       id: "R15", stage: 1, room: "Прихожая", title: "Wi-Fi роутер (ВНЕ ЩР)",
       kind: "socket", sockets: 1, rj45: 0, ip44: false, watts: 30, groupId: "G08",
-      wallId: "hall_right", x: 1855, y: 1455, refSide: "right", offsetMm: 300, heightMm: 2150, byPencil: false, comment: "22) Wi-Fi роутер h=2150 ВНЕ железного щита; отсюда витая пара Cat 6 в зал"
+      wallId: "hall_left", x: 1750, y: 1440, refSide: "right", offsetMm: 709, heightMm: 2500, byPencil: false, comment: "22) Wi-Fi роутер h=2500 ВНЕ железного щита; левая стена прихожей"
     },
     {
       id: "R16", stage: 1, room: "Прихожая", title: "Щит ЩР (36–48 мод. над М)",
